@@ -1,0 +1,91 @@
+<div class="page-container">
+  <div class="page-header">
+    <div>
+      <h2>Mapeo de Topología Lógica</h2>
+      <p class="subtitle">Inspección de nodos, enlaces y estado del hardware</p>
+    </div>
+    <div class="status-badges">
+      <span class="badge badge-ok">12 Nodos Online</span>
+      <span class="badge badge-alert">1 Nodo Crítico</span>
+    </div>
+  </div>
+
+  <div class="topology-layout">
+    
+    <div class="enterprise-panel map-section">
+      <div class="panel-header">
+        <h3>Lienzo de Red (Capa 3)</h3>
+        <div class="map-controls">
+          <button class="btn-outline">✚ Zoom In</button>
+          <button class="btn-outline">━ Zoom Out</button>
+          <button class="btn-outline">⟳ Centrar</button>
+        </div>
+      </div>
+      <div class="panel-body canvas-area">
+        <div class="canvas-placeholder">
+          <div class="scan-line"></div>
+          <span>[ Motor de Renderizado de Nodos Activo ]</span>
+          <small>Esperando conexión con API de telemetría...</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="enterprise-panel nodes-section">
+      <div class="panel-header">
+        <h3>Salud de Dispositivos</h3>
+      </div>
+      <div class="nodes-list">
+        
+        <div class="node-card ok-node">
+          <div class="node-header">
+            <span class="node-icon">🖧</span>
+            <div>
+              <strong>RT-CORE-01</strong>
+              <small>10.0.0.1 (Principal)</small>
+            </div>
+            <span class="status-dot"></span>
+          </div>
+          <div class="node-metrics">
+            <span>CPU: 28%</span>
+            <span>RAM: 45%</span>
+            <span>Temp: 42°C</span>
+          </div>
+        </div>
+
+        <div class="node-card ok-node">
+          <div class="node-header">
+            <span class="node-icon">🖧</span>
+            <div>
+              <strong>RT-CORE-02</strong>
+              <small>10.0.0.2 (Standby)</small>
+            </div>
+            <span class="status-dot"></span>
+          </div>
+          <div class="node-metrics">
+            <span>CPU: 15%</span>
+            <span>RAM: 30%</span>
+            <span>Temp: 38°C</span>
+          </div>
+        </div>
+
+        <div class="node-card critical-node">
+          <div class="node-header">
+            <span class="node-icon">🛡️</span>
+            <div>
+              <strong>FW-EDGE-01</strong>
+              <small>192.168.1.254 (DMZ)</small>
+            </div>
+            <span class="status-dot alert-dot"></span>
+          </div>
+          <div class="node-metrics">
+            <span class="alert-text">CPU: 98%</span>
+            <span>RAM: 85%</span>
+            <span class="alert-text">Temp: 78°C</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    
+  </div>
+</div>

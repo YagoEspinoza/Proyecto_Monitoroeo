@@ -1,1 +1,25 @@
-/* You can add global styles to this file, and also import other style files */
+/* src/styles.css */
+:root {
+  /* Paleta Corporativa (Modo Claro/Profesional) */
+  --bg-app: #f3f4f6;          /* Gris muy claro para el fondo */
+  --bg-surface: #ffffff;      /* Blanco puro para las tarjetas */
+  --bg-sidebar: #1e293b;      /* Azul pizarra oscuro para el menú lateral */
+  --text-primary: #0f172a;    /* Texto principal casi negro */
+  --text-secondary: #64748b;  /* Texto secundario grisáceo */
+  --border-color: #e2e8f0;    /* Bordes sutiles */
+  
+  /* Colores semánticos más sobrios */
+  --color-ok: #059669;        /* Verde esmeralda */
+  --color-alert: #dc2626;     /* Rojo carmesí */
+  --color-brand: #2563eb;     /* Azul corporativo */
+}
+
+body, html {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-app);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  height: 100vh;
+  overflow: hidden; /* Evita el scroll global, lo manejamos por zonas */
+}

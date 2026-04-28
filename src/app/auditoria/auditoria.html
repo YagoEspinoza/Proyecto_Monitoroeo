@@ -1,0 +1,106 @@
+<div class="page-container">
+  <div class="page-header">
+    <div>
+      <h2>Auditoría de Sistema y Logs (SIEM)</h2>
+      <p class="subtitle">Monitoreo de eventos de red, accesos y alertas del IDS/IPS</p>
+    </div>
+    <div class="actions">
+      <button class="btn-outline">📥 Exportar CSV</button>
+      <button class="btn-outline">📄 Generar Reporte PDF</button>
+    </div>
+  </div>
+
+  <div class="audit-layout">
+    <aside class="enterprise-panel filters-panel">
+      <div class="panel-header">
+        <h3>Filtros de Búsqueda</h3>
+      </div>
+      <div class="panel-body form-layout">
+        <div class="form-group">
+          <label>Rango de Tiempo</label>
+          <select class="form-control">
+            <option>Últimos 15 minutos</option>
+            <option selected>Última hora</option>
+            <option>Últimas 24 horas</option>
+            <option>Últimos 7 días</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>Nivel de Severidad</label>
+          <div class="checkbox-group">
+            <label><input type="checkbox" checked> <span class="badge-dot crit"></span> Critical</label>
+            <label><input type="checkbox" checked> <span class="badge-dot warn"></span> Warning</label>
+            <label><input type="checkbox"> <span class="badge-dot info"></span> Info</label>
+            <label><input type="checkbox"> <span class="badge-dot debug"></span> Debug</label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Origen (IP / Hostname)</label>
+          <input type="text" class="form-control" placeholder="Ej: 192.168.30.*">
+        </div>
+
+        <button class="btn-primary w-100">Aplicar Filtros</button>
+      </div>
+    </aside>
+
+    <div class="enterprise-panel logs-panel">
+      <div class="panel-header logs-header">
+        <div class="search-bar">
+          <span>>_</span>
+          <input type="text" placeholder="Escriba su consulta (Ej: dest_port=445 AND action=DROP)...">
+        </div>
+        <span class="results-count">Mostrando 4 eventos</span>
+      </div>
+      
+      <div class="terminal-window">
+        
+        <div class="log-entry critical">
+          <div class="log-meta">
+            <span class="timestamp">2026-04-28 17:01:22.451</span>
+            <span class="severity">CRITICAL</span>
+            <span class="facility">authpriv</span>
+          </div>
+          <div class="log-message">
+            Failed password for root from <span class="highlight-ip">192.168.30.45</span> port 55123 ssh2 - POSSIBLE BRUTE FORCE
+          </div>
+        </div>
+
+        <div class="log-entry warning">
+          <div class="log-meta">
+            <span class="timestamp">2026-04-28 16:58:10.002</span>
+            <span class="severity">WARNING</span>
+            <span class="facility">firewall</span>
+          </div>
+          <div class="log-message">
+            Connection rate limit exceeded from <span class="highlight-ip">172.16.5.100</span> to DMZ_WEB_SERVER - Action: Throttle
+          </div>
+        </div>
+
+        <div class="log-entry info">
+          <div class="log-meta">
+            <span class="timestamp">2026-04-28 16:45:00.110</span>
+            <span class="severity">INFO</span>
+            <span class="facility">syslog</span>
+          </div>
+          <div class="log-message">
+            %HSRP-5-STATECHANGE: Vlan10 Grp 1 state Standby -> Active. Primary router failover successful.
+          </div>
+        </div>
+
+        <div class="log-entry info">
+          <div class="log-meta">
+            <span class="timestamp">2026-04-28 16:30:15.882</span>
+            <span class="severity">INFO</span>
+            <span class="facility">audit</span>
+          </div>
+          <div class="log-message">
+            Admin_Sec successfully logged in from 10.0.0.55 via HTTPS. Session ID: x9a8f...
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

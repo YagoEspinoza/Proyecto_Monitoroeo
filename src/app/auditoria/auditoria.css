@@ -1,0 +1,94 @@
+.page-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  height: 100%;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.page-header h2 { margin: 0; color: var(--text-primary); font-size: 1.5rem; }
+.subtitle { margin: 5px 0 0 0; color: var(--text-secondary); font-size: 0.9rem; }
+.actions { display: flex; gap: 10px; }
+
+/* Botones */
+.btn-outline { background: transparent; border: 1px solid var(--border-color); padding: 8px 16px; border-radius: 4px; font-size: 0.85rem; color: var(--text-secondary); cursor: pointer; font-weight: 500; }
+.btn-outline:hover { border-color: var(--text-primary); color: var(--text-primary); }
+.btn-primary { background-color: var(--color-brand); color: white; border: none; padding: 10px 16px; border-radius: 4px; cursor: pointer; font-weight: 600; }
+.w-100 { width: 100%; margin-top: 15px; }
+
+/* Layout de Auditoría */
+.audit-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 20px;
+  flex-grow: 1;
+}
+
+/* Panel de Filtros */
+.filters-panel { height: fit-content; }
+.form-layout { padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+.form-group label { display: block; font-size: 0.85rem; color: var(--text-secondary); font-weight: 600; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+.form-control { width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 0.9rem; box-sizing: border-box; }
+.form-control:focus { outline: none; border-color: var(--color-brand); }
+
+.checkbox-group { display: flex; flex-direction: column; gap: 8px; }
+.checkbox-group label { text-transform: none; font-weight: 400; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; margin: 0; color: var(--text-primary); cursor: pointer; }
+
+/* Puntos de Severidad */
+.badge-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.badge-dot.crit { background-color: var(--color-alert); }
+.badge-dot.warn { background-color: #f59e0b; }
+.badge-dot.info { background-color: var(--color-brand); }
+.badge-dot.debug { background-color: #94a3b8; }
+
+/* Panel de Logs */
+.logs-panel { display: flex; flex-direction: column; overflow: hidden; }
+.logs-header { display: flex; justify-content: space-between; padding: 12px 20px; }
+.results-count { font-size: 0.85rem; color: var(--text-secondary); font-weight: 500; }
+
+.search-bar { display: flex; align-items: center; gap: 10px; flex-grow: 1; max-width: 600px; }
+.search-bar span { color: var(--color-brand); font-weight: bold; font-family: monospace; }
+.search-bar input { border: none; background: transparent; outline: none; width: 100%; font-family: 'Consolas', monospace; font-size: 0.9rem; color: var(--text-primary); }
+
+/* Consola / Visor de Logs */
+.terminal-window {
+  background-color: #0f172a; /* Fondo muy oscuro, típico de consolas */
+  flex-grow: 1;
+  padding: 15px;
+  overflow-y: auto;
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.log-entry {
+  display: flex;
+  gap: 15px;
+  padding: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+.log-entry:hover { background-color: rgba(255, 255, 255, 0.03); }
+
+/* Metadatos del Log */
+.log-meta { display: flex; gap: 10px; min-width: 250px; flex-shrink: 0; }
+.timestamp { color: #94a3b8; }
+.severity { font-weight: bold; width: 70px; text-align: center; border-radius: 2px; padding: 0 4px; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; }
+.facility { color: #64748b; font-style: italic; }
+
+/* Mensaje del Log */
+.log-message { color: #cbd5e1; word-break: break-all; }
+.highlight-ip { color: #38bdf8; text-decoration: underline; text-decoration-style: dotted; cursor: pointer; }
+
+/* Colores por Severidad */
+.critical .severity { background-color: rgba(220, 38, 38, 0.2); color: #fca5a5; border: 1px solid rgba(220, 38, 38, 0.5); }
+.critical .log-message { color: #fca5a5; }
+
+.warning .severity { background-color: rgba(245, 158, 11, 0.2); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.5); }
+.warning .log-message { color: #fde68a; }
+
+.info .severity { background-color: rgba(37, 99, 235, 0.2); color: #93c5fd; border: 1px solid rgba(37, 99, 235, 0.5); }
