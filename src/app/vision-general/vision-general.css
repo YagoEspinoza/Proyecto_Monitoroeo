@@ -1,0 +1,390 @@
+.vg-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* CABECERA */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.page-title {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.page-subtitle {
+  margin: 4px 0 0;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  font-family: monospace;
+}
+.header-right {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.header-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+.badge-gray { background: var(--bg-app); }
+.dot-verde {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  animation: pulso 2s infinite;
+}
+@keyframes pulso {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+/* KPI GRID */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+.kpi-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-left: 4px solid transparent;
+  border-radius: 8px;
+  padding: 18px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+}
+.kpi-ok   { border-left-color: #10b981; }
+.kpi-warn { border-left-color: #f59e0b; }
+.kpi-crit { border-left-color: #ef4444; }
+.kpi-blue { border-left-color: #3b82f6; }
+
+.kpi-icon-box {
+  width: 42px; height: 42px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+.kpi-icon-box.ok   { background: rgba(16,185,129,0.1); color: #10b981; }
+.kpi-icon-box.warn { background: rgba(245,158,11,0.1);  color: #f59e0b; }
+.kpi-icon-box.crit { background: rgba(239,68,68,0.1);   color: #ef4444; }
+.kpi-icon-box.blue { background: rgba(59,130,246,0.1);  color: #3b82f6; }
+
+.kpi-data { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.kpi-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+}
+.kpi-valor {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+}
+.kpi-valor small { font-size: 1rem; color: var(--text-secondary); font-weight: 400; }
+.kpi-sub { font-size: 0.72rem; color: var(--text-secondary); }
+.kpi-barra {
+  height: 4px; background: var(--bg-app);
+  border-radius: 2px; margin-top: 6px; overflow: hidden;
+}
+.kpi-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; }
+.fill-ok { background: #10b981; }
+
+/* HSRP BANNER */
+.hsrp-banner {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.hsrp-titulo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+.hsrp-badge {
+  background: rgba(37,99,235,0.1);
+  color: var(--color-brand);
+  border: 1px solid rgba(37,99,235,0.3);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+.hsrp-items {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex: 1;
+  flex-wrap: wrap;
+}
+.hsrp-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 0 18px;
+}
+.hsrp-sep {
+  width: 1px; height: 36px;
+  background: var(--border-color);
+  flex-shrink: 0;
+}
+.hsrp-lbl {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-secondary);
+}
+.hsrp-val {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-family: monospace;
+}
+.hsrp-val.verde { color: #10b981; }
+
+/* GRID PRINCIPAL */
+.main-grid {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 16px;
+}
+
+/* PANELES */
+.panel {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.panel-header {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+.panel-titulo {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.panel-badge {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  background: var(--bg-app);
+  border: 1px solid var(--border-color);
+  padding: 2px 10px;
+  border-radius: 12px;
+}
+.badge-rojo {
+  background: rgba(239,68,68,0.08);
+  color: #ef4444;
+  border-color: rgba(239,68,68,0.25);
+}
+
+/* TABLA */
+.tabla-wrapper { overflow-x: auto; overflow-y: auto; max-height: 380px; }
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.83rem;
+}
+.tabla thead th {
+  padding: 10px 14px;
+  text-align: left;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+  background: var(--bg-app);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky; top: 0;
+  white-space: nowrap;
+}
+.tabla tbody tr {
+  border-bottom: 1px solid var(--border-color);
+  transition: background 0.15s;
+}
+.tabla tbody tr:hover { background: var(--bg-app); }
+.tabla tbody td { padding: 10px 14px; color: var(--text-primary); }
+.fila-inactivo td  { opacity: 0.45; }
+.fila-degradado    { border-left: 3px solid #f59e0b; }
+
+.tipo-ico { margin-right: 8px; opacity: 0.5; }
+.mono     { font-family: monospace; font-size: 0.78rem; }
+
+.txt-ok   { color: #10b981; font-weight: 600; }
+.txt-warn { color: #f59e0b; font-weight: 600; }
+.txt-off  { color: var(--text-secondary); }
+.txt-dim  { color: var(--text-secondary); }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+.badge-activo    { background: rgba(16,185,129,0.1);  color: #10b981; border: 1px solid rgba(16,185,129,0.3); }
+.badge-inactivo  { background: rgba(239,68,68,0.1);   color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
+.badge-degradado { background: rgba(245,158,11,0.1);  color: #f59e0b; border: 1px solid rgba(245,158,11,0.3); }
+
+/* ALERTAS */
+.alertas-lista { overflow-y: auto; max-height: 380px; }
+.alerta-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color);
+  border-left: 3px solid transparent;
+  transition: background 0.15s;
+}
+.alerta-item:hover   { background: var(--bg-app); }
+.alerta-item.reconocida { opacity: 0.45; }
+.alerta-critico     { border-left-color: #ef4444; }
+.alerta-alto        { border-left-color: #f97316; }
+.alerta-advertencia { border-left-color: #f59e0b; }
+.alerta-info        { border-left-color: #3b82f6; }
+
+.alerta-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.alerta-badge {
+  font-size: 0.62rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 3px;
+  letter-spacing: 1px;
+}
+.nivel-critico     { background: rgba(239,68,68,0.15);   color: #ef4444; }
+.nivel-alto        { background: rgba(249,115,22,0.15);  color: #f97316; }
+.nivel-advertencia { background: rgba(245,158,11,0.15);  color: #f59e0b; }
+.nivel-info        { background: rgba(59,130,246,0.15);  color: #3b82f6; }
+
+.alerta-id     { font-size: 0.72rem; color: var(--text-secondary); }
+.alerta-tiempo { font-size: 0.7rem;  color: var(--text-secondary); margin-left: auto; }
+.alerta-msg    { margin: 0 0 8px; font-size: 0.8rem; color: var(--text-primary); line-height: 1.4; }
+.alerta-foot   { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+.alerta-meta   { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.vlan-chip {
+  background: rgba(37,99,235,0.08);
+  color: var(--color-brand);
+  border: 1px solid rgba(37,99,235,0.2);
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 0.65rem;
+  font-family: monospace;
+}
+.btn-ack {
+  font-size: 0.7rem; padding: 3px 10px;
+  background: transparent;
+  border: 1px solid #10b981; color: #10b981;
+  border-radius: 4px; cursor: pointer;
+  transition: all 0.2s; white-space: nowrap;
+}
+.btn-ack:hover { background: #10b981; color: white; }
+.ack-ok { font-size: 0.7rem; color: #10b981; }
+
+/* BOTTOM GRID */
+.bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 16px;
+}
+
+/* TRAFICO */
+.trafico-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 16px;
+}
+.trafico-item { margin-bottom: 16px; }
+.trafico-head {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.trafico-nombre { font-size: 0.8rem; color: var(--text-primary); }
+.trafico-valor  { font-size: 0.8rem; font-weight: 700; font-family: monospace; }
+.trafico-barra-bg {
+  height: 8px;
+  background: var(--bg-app);
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+.trafico-barra-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.6s ease;
+}
+.trafico-pct {
+  font-size: 0.68rem;
+  color: var(--text-secondary);
+  margin-top: 3px;
+  font-family: monospace;
+}
+
+/* VLANS GRID */
+.vlans-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  padding: 16px;
+}
+.vlan-card {
+  border: 1px solid var(--border-color);
+  border-top: 3px solid;
+  border-radius: 6px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  transition: transform 0.2s;
+}
+.vlan-card:hover { transform: translateY(-2px); }
+.vlan-id     { font-size: 0.65rem; font-weight: 700; font-family: monospace; color: var(--text-secondary); letter-spacing: 1px; }
+.vlan-nombre { font-size: 0.85rem; font-weight: 600; color: var(--text-primary); }
+.vlan-rango  { font-size: 0.72rem; color: var(--text-secondary); }
+.vlan-info   { font-size: 0.7rem;  color: var(--text-secondary); }
+.vlan-estado { font-size: 0.7rem;  font-weight: 600; margin-top: 4px; }
+.vlan-estado.ok   { color: #10b981; }
+.vlan-estado.warn { color: #f59e0b; }

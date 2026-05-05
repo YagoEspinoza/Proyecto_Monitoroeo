@@ -1,4 +1,5 @@
 <div class="enterprise-layout">
+  <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="sidebar-brand">
       <div class="logo-box">SOC</div>
@@ -11,67 +12,41 @@
       <li routerLink="/auditoria" routerLinkActive="active">Auditoría y Logs</li>
       <li routerLink="/configuracion" routerLinkActive="active">Configuración</li>
     </ul>
+
+    <!-- Estado del sistema -->
+    <div class="sys-status">
+      <div class="status-line">SYS &nbsp;: <span class="ok">NOMINAL</span></div>
+      <div class="status-line">WS &nbsp;&nbsp;: 
+        <span [class]="wsConectado() ? 'ok' : 'err'">
+          {{ wsConectado() ? 'ACTIVE' : 'OFFLINE' }}
+        </span>
+      </div>
+    </div>
   </aside>
 
+  <!-- CONTENIDO PRINCIPAL -->
   <div class="main-wrapper">
+
+    <!-- TOPBAR -->
     <header class="topbar">
       <div class="breadcrumbs">
-        <span>Dashboards</span> / <strong>Visión General de Red</strong>
+        <span>NetGuard</span> / <strong>Panel de Control</strong>
       </div>
       <div class="user-profile">
-        <span class="user-role">Administrador de Red</span>
-        <div class="avatar">AD</div>
+        <div class="ws-indicator" [class.connected]="wsConectado()">
+          <span class="pulse-dot"></span>
+          <span>{{ wsConectado() ? 'EN LÍNEA' : 'SIN CONEXIÓN' }}</span>
+        </div>
+        <span class="user-role">{{ authService.usuario()?.nombre || 'Administrador' }}</span>
+        <div class="avatar">{{ (authService.usuario()?.nombre?.[0] || 'A').toUpperCase() }}</div>
+        <button class="btn-logout" (click)="cerrarSesion()">SALIR</button>
       </div>
     </header>
 
+    <!-- PÁGINA ACTIVA (rutas hijas) -->
     <main class="dashboard-content">
       <router-outlet></router-outlet>
-      
-      <div class="kpi-row">
-        <div class="kpi-card">
-          <span class="kpi-label">Estado de Alta Disponibilidad (HSRP)</span>
-          <strong class="kpi-value ok-status">Activo - Router-A</strong>
-        </div>
-        <div class="kpi-row-item kpi-card">
-          <span class="kpi-label">Uptime de Red</span>
-          <strong class="kpi-value neutral-status">99.98%</strong>
-        </div>
-        <div class="kpi-row-item kpi-card">
-          <span class="kpi-label">Tráfico Anómalo (Últimas 24h)</span>
-          <strong class="kpi-value alert-status">1 Incidente(s)</strong>
-        </div>
-      </div>
-
-      <div class="panels-grid">
-        <div class="enterprise-panel panel-large">
-          <div class="panel-header">
-            <h3>Mapa de Segmentación (VLANs)</h3>
-            <button class="btn-outline">Exportar Vista</button>
-          </div>
-          <div class="panel-body placeholder-area">
-            <span>Área de renderizado de topología lógica</span>
-          </div>
-        </div>
-
-        <div class="enterprise-panel panel-side">
-          <div class="panel-header">
-            <h3>Centro de Alertas IDS/IPS</h3>
-          </div>
-          <div class="panel-body placeholder-area">
-            <span>Registro de eventos y syslog</span>
-          </div>
-        </div>
-
-        <div class="enterprise-panel panel-bottom">
-          <div class="panel-header">
-            <h3>Métricas de Tráfico y Failover</h3>
-          </div>
-          <div class="panel-body placeholder-area">
-            <span>Gráficos de telemetría</span>
-          </div>
-        </div>
-      </div>
-      
     </main>
+
   </div>
 </div>

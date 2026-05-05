@@ -1,22 +1,29 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
+import { environment } from '../../environments/environment';
+import { Dispositivo, EstadisticasDispositivos } from '../core/models/dispositivo.model';
+import { ListadoAlertas } from '../core/models/alerta.model';
 
-export interface SecurityEvent {
-  id: string;
-  severity: 'CRITICAL' | 'WARNING' | 'INFO';
-  sourceIp: string;
-  destIp: string;
-  port: number;
-  message: string;
-  vlan: number;
-  timestamp: Date;
-}
-
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class NetworkService {
-  
+  private apiUrl = environment.apiUrl;
+
+  constructor(private http: HttpClient) {}
+
+  getDispositivos(): Observable<Dispositivo[]> {
+    return this.http.get<Dispositivo[]>(`${this.apiUrl}/dispositivos`);
+  }
+
+  getEstadisticas(): Observable<EstadisticasDispositivos> {
+    return this.http.get<EstadisticasDispositivos>(`${this.apiUrl}/dispositivos/estadisticas`);
+  }
+
+  getAlertas(limit = 10): Observable<ListadoAlertas> {
+    return this.http.get<ListadoAlertas>(`${this.apiUrl}/alertas?limit=${limit}`);
+  }
+
+  // Mantén los datos mock mientras no tengas backend:
   getRouterStatus(): Observable<any> {
     return of({
       role: 'Active',
@@ -25,40 +32,5 @@ export class NetworkService {
       protocol: 'HSRPv2',
       lastSwitch: 'Hace 14 días'
     });
-  }
-
-  getSecurityAlerts(): Observable<SecurityEvent[]> {
-    return of([
-      { 
-        id: 'SYS-8902', 
-        severity: 'CRITICAL', 
-        sourceIp: '192.168.30.45', 
-        destIp: '10.10.10.5', 
-        port: 445,
-        message: 'Posible escaneo SMB / Intento Ransomware contenido', 
-        vlan: 30, 
-        timestamp: new Date() 
-      },
-      { 
-        id: 'SYS-8901', 
-        severity: 'WARNING', 
-        sourceIp: '172.16.5.100', 
-        destIp: '8.8.8.8', 
-        port: 53,
-        message: 'Tráfico DNS inusualmente alto', 
-        vlan: 20, 
-        timestamp: new Date(new Date().getTime() - 5 * 60000) // Hace 5 minutos
-      },
-      { 
-        id: 'SYS-8900', 
-        severity: 'INFO', 
-        sourceIp: '10.0.0.1', 
-        destIp: '224.0.0.2', 
-        port: 1985,
-        message: 'HSRP Hello packet recibido', 
-        vlan: 10, 
-        timestamp: new Date(new Date().getTime() - 15 * 60000) 
-      }
-    ]);
   }
 }
