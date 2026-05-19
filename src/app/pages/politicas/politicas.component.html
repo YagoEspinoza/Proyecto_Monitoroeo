@@ -1,0 +1,107 @@
+<app-page-shell>
+  <div class="page">
+    <header class="page-header">
+      <div>
+        <h1 class="page-title">Políticas de seguridad</h1>
+        <p class="page-subtitle">Reglas IDS/IPS · integradas con VLANs, alertas y cuarentena</p>
+      </div>
+      <div class="header-actions">
+        <span class="chip mono">{{ policies.activas().length }} activas · {{ policies.totalImpactos() | number }} impactos</span>
+        @if (puedeEditar()) {
+          <button type="button" class="btn btn-outline btn-sm" [disabled]="sincronizando()" (click)="sincronizar()">
+            {{ sincronizando() ? 'Sincronizando...' : '⟳ Sincronizar' }}
+          </button>
+          <button type="button" class="btn btn-primary btn-sm" (click)="abrirCrear()">+ Nueva política</button>
+        }
+      </div>
+    </header>
+
+    <div class="kpi-grid mini-kpi">
+      <div class="mini-card"><span class="lbl">Activas</span><strong>{{ policies.activas().length }}</strong></div>
+      <div class="mini-card crit"><span class="lbl">Críticas</span><strong>{{ policies.criticas().length }}</strong></div>
+      <div class="mini-card"><span class="lbl">Impactos totales</span><strong class="mono">{{ policies.totalImpactos() | number }}</strong></div>
+      <div class="mini-card"><span class="lbl">Sensibilidad sistema</span><strong>{{ mock.metricas().estadoGlobal | uppercase }}</strong></div>
+    </div>
+
+    <div class="toolbar panel">
+      <input type="search" class="search-input" placeholder="Buscar política..." [value]="busqueda()" (input)="busqueda.set($any($event.target).value)" />
+    </div>
+
+    @if (listaFiltrada().length === 0) {
+      <app-empty-state titulo="Sin políticas" descripcion="Crea una regla de seguridad para comenzar." />
+    } @else {
+      <div class="policy-grid">
+        @for (p of listaFiltrada(); track p.id) {
+          <article class="policy-card" [class]="claseEstado(p.estado)">
+            <div class="policy-head">
+              <span class="policy-badge" [class]="claseEstado(p.estado)">{{ etiquetaEstado(p.estado) }}</span>
+              <span class="mono dim">{{ p.id }}</span>
+            </div>
+            <h3>{{ p.nombre }}</h3>
+            <p class="desc">{{ p.descripcion }}</p>
+            <div class="policy-meta">
+              <span class="tag">{{ etiquetaTipo(p.tipo) }}</span>
+              <span class="tag">Acción: {{ p.accion }}</span>
+              <span class="tag">VLANs: {{ nombresVlans(p.vlanIds) }}</span>
+            </div>
+            <div class="policy-stats mono">
+              <span>Prioridad {{ p.prioridad }}</span>
+              <span>{{ p.impactos | number }} impactos</span>
+            </div>
+            @if (puedeEditar()) {
+              <div class="policy-actions">
+                <button type="button" class="btn btn-sm" [class.btn-success]="p.activa" [class.btn-outline]="!p.activa" (click)="toggle(p)">
+                  {{ p.activa ? 'Desactivar' : 'Activar' }}
+                </button>
+                <button type="button" class="btn btn-outline btn-sm" (click)="abrirEditar(p)">Editar</button>
+                <button type="button" class="btn btn-danger btn-sm" (click)="eliminar(p)">Eliminar</button>
+              </div>
+            }
+          </article>
+        }
+      </div>
+    }
+  </div>
+</app-page-shell>
+
+<app-modal [abierto]="modalAbierto()" [titulo]="editando() ? 'Editar política' : 'Nueva política'" size="lg" (cerrar)="cerrarModal()">
+  <form [formGroup]="form" class="policy-form">
+    <label>Nombre<input formControlName="nombre" /></label>
+    <label>Descripción<textarea formControlName="descripcion" rows="2"></textarea></label>
+    <div class="form-row">
+      <label>Tipo
+        <select formControlName="tipo">
+          <option value="bloquear_trafico_sospechoso">Bloquear tráfico sospechoso</option>
+          <option value="aislar_desconocidos">Aislar desconocidos</option>
+          <option value="limitar_vlan">Limitar accesos VLAN</option>
+          <option value="intentos_fallidos">Intentos fallidos</option>
+          <option value="cuarentena_automatica">Cuarentena automática</option>
+        </select>
+      </label>
+      <label>Acción
+        <select formControlName="accion">
+          <option value="bloquear">Bloquear</option>
+          <option value="aislar">Aislar</option>
+          <option value="alertar">Alertar</option>
+          <option value="monitorear">Monitorear</option>
+        </select>
+      </label>
+    </div>
+    <div class="form-row">
+      <label>Estado
+        <select formControlName="estado">
+          <option value="activa">Activa</option>
+          <option value="critica">Crítica</option>
+          <option value="monitoreo">En monitoreo</option>
+          <option value="deshabilitada">Deshabilitada</option>
+        </select>
+      </label>
+      <label>Prioridad<input type="number" formControlName="prioridad" min="1" max="99" /></label>
+    </div>
+    <label>VLANs (IDs separados por coma)<input formControlName="vlanIds" placeholder="10,20,30,999" /></label>
+  </form>
+  <div footer>
+    <button type="button" class="btn btn-outline" (click)="cerrarModal()">Cancelar</button>
+    <button type="button" class="btn btn-primary" [disabled]="form.invalid" (click)="guardar()">Guardar</button>
+  </div>
+</app-modal>

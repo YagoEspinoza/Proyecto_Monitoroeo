@@ -1,0 +1,72 @@
+<app-page-shell [useSkeleton]="true">
+  <div class="page">
+    <header class="page-header">
+      <div>
+        <h1 class="page-title">VLAN de cuarentena</h1>
+        <p class="page-subtitle">VLAN 999 · hosts aislados sin acceso a la red corporativa</p>
+      </div>
+    </header>
+
+    <div class="quarantine-banner">
+      <div class="banner-icon">⛔</div>
+      <div>
+        <strong>Zona de aislamiento activa</strong>
+        <p>Los dispositivos en esta VLAN no pueden comunicarse con otras segmentos. Solo tráfico de inspección forense permitido.</p>
+      </div>
+      <app-status-badge estado="aislado" />
+    </div>
+
+    @if (mock.dispositivosCuarentena().length === 0) {
+      <app-empty-state
+        icono="✓"
+        titulo="Cuarentena vacía"
+        descripcion="No hay hosts aislados en este momento." />
+    } @else {
+      <section class="panel quarantine-panel">
+        <div class="panel-header">
+          <span class="panel-title">Hosts en cuarentena</span>
+          <span class="panel-badge">{{ mock.dispositivosCuarentena().length }} aislados</span>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Host</th>
+                <th>IP (cuarentena)</th>
+                <th>MAC</th>
+                <th>Motivo</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (d of mock.dispositivosCuarentena(); track d.id) {
+                <tr>
+                  <td><strong>{{ d.nombre }}</strong></td>
+                  <td class="mono">{{ d.ip }}</td>
+                  <td class="mono">{{ d.mac }}</td>
+                  <td><app-status-badge [estado]="d.seguridad" /></td>
+                  <td class="actions">
+                    <button type="button" class="btn btn-success btn-sm" (click)="liberar(d)">Liberar</button>
+                    <button type="button" class="btn btn-danger btn-sm" (click)="bloquearPermanente(d)">Bloquear</button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+    }
+
+    @if (mock.vlanCuarentena(); as vlan) {
+      <div class="vlan-info-card">
+        <h3>Configuración VLAN {{ vlan.id }}</h3>
+        <div class="info-grid">
+          <div><span>Rango</span><strong class="mono">{{ vlan.rango }}</strong></div>
+          <div><span>Gateway</span><strong class="mono">{{ vlan.gateway }}</strong></div>
+          <div><span>ACL</span><strong>DENY ALL → CORP</strong></div>
+          <div><span>Tráfico</span><strong>{{ vlan.traficoMbps | number:'1.0-0' }} Mbps</strong></div>
+        </div>
+      </div>
+    }
+  </div>
+</app-page-shell>

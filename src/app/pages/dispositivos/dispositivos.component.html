@@ -1,0 +1,103 @@
+<app-page-shell [useSkeleton]="true">
+  <div class="page">
+    <header class="page-header">
+      <div>
+        <h1 class="page-title">Dispositivos conectados</h1>
+        <p class="page-subtitle">Inventario de hosts · estado operativo y de seguridad</p>
+      </div>
+    </header>
+
+    <div class="toolbar">
+      <input
+        type="search"
+        class="search-input"
+        placeholder="Buscar por nombre, IP o MAC..."
+        [value]="busqueda()"
+        (input)="busqueda.set($any($event.target).value)" />
+      <div class="filtros">
+        @for (f of ['todos', 'seguro', 'alerta', 'intruso', 'aislado']; track f) {
+          <button
+            type="button"
+            class="btn btn-sm"
+            [class.btn-primary]="filtro() === f"
+            [class.btn-outline]="filtro() !== f"
+            (click)="filtro.set($any(f))">
+            {{ f === 'todos' ? 'Todos' : (f | titlecase) }}
+          </button>
+        }
+      </div>
+    </div>
+
+    @if (lista().length === 0) {
+      <app-empty-state
+        icono="⊞"
+        titulo="Sin resultados"
+        descripcion="No hay dispositivos que coincidan con el filtro actual." />
+    } @else {
+      <section class="panel">
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Dispositivo</th>
+                <th>IP</th>
+                <th>MAC</th>
+                <th>VLAN</th>
+                <th>Ubicación</th>
+                <th>Latencia</th>
+                <th>Uptime</th>
+                <th>Operativo</th>
+                <th>Seguridad</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (d of lista(); track d.id) {
+                <tr [class.row-intruso]="d.seguridad === 'intruso'">
+                  <td>
+                    <span class="tipo">{{ iconoTipo(d.tipo) }}</span>
+                    <strong>{{ d.nombre }}</strong>
+                  </td>
+                  <td class="mono">{{ d.ip }}</td>
+                  <td class="mono">{{ d.mac }}</td>
+                  <td class="mono">{{ d.vlan }}</td>
+                  <td>{{ d.ubicacion }}</td>
+                  <td class="mono">{{ d.latencia !== null ? d.latencia + 'ms' : '—' }}</td>
+                  <td class="mono">{{ d.uptime }}%</td>
+                  <td><app-status-badge [estado]="d.estado" /></td>
+                  <td><app-status-badge [estado]="d.seguridad" /></td>
+                  <td class="actions">
+                    <button type="button" class="btn btn-outline btn-sm" (click)="seleccionado.set(d)">Ver</button>
+                    @if (d.seguridad === 'intruso' || d.seguridad === 'alerta') {
+                      <button type="button" class="btn btn-danger btn-sm" (click)="aislar(d)">Aislar</button>
+                    }
+                    @if (d.seguridad === 'aislado') {
+                      <button type="button" class="btn btn-success btn-sm" (click)="liberar(d)">Liberar</button>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+    }
+  </div>
+</app-page-shell>
+
+<app-modal
+  [abierto]="!!seleccionado()"
+  [titulo]="seleccionado()?.nombre ?? ''"
+  size="lg"
+  (cerrar)="seleccionado.set(null)">
+  @if (seleccionado(); as d) {
+    <div class="detail-grid">
+      <div><label>IP</label><span class="mono">{{ d.ip }}</span></div>
+      <div><label>MAC</label><span class="mono">{{ d.mac }}</span></div>
+      <div><label>VLAN</label><span>{{ d.vlan }}</span></div>
+      <div><label>Última actividad</label><span>{{ d.ultimaActividad }}</span></div>
+      <div><label>Paquetes perdidos</label><span>{{ d.paquetesPerdidos }}%</span></div>
+      <div><label>Seguridad</label><app-status-badge [estado]="d.seguridad" /></div>
+    </div>
+  }
+</app-modal>

@@ -1,0 +1,10 @@
+.report-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.report-card { padding: 20px; }
+.report-card h3 { margin: 0 0 8px; }
+.report-card p { color: var(--text-secondary); font-size: 0.85rem; margin: 0 0 16px; }
+.report-btns { display: flex; gap: 8px; }

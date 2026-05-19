@@ -1,0 +1,70 @@
+<app-page-shell [useSkeleton]="true">
+  <div class="page">
+    <header class="page-header">
+      <div>
+        <h1 class="page-title">Auditoría y logs</h1>
+        <p class="page-subtitle">Registro de eventos del sistema · {{ mock.reloj() | date:'dd/MM/yyyy HH:mm:ss' }}</p>
+      </div>
+      <div class="header-btns">
+        <span class="live-badge" [class.off]="!enVivo()">
+          <span class="pulse-dot"></span> {{ enVivo() ? 'EN VIVO' : 'PAUSADO' }}
+        </span>
+        <button type="button" class="btn btn-outline btn-sm" (click)="toggleEnVivo()">
+          {{ enVivo() ? 'Pausar' : 'Reanudar' }}
+        </button>
+        <button type="button" class="btn btn-outline btn-sm" (click)="limpiarVista()">Actualizar</button>
+        <button type="button" class="btn btn-primary btn-sm" [disabled]="exportando()" (click)="exportar()">
+          @if (exportando()) { Exportando... } @else { ↓ Exportar CSV }
+        </button>
+      </div>
+    </header>
+
+    <div class="toolbar toolbar-modulos">
+      <span class="toolbar-label">Módulo:</span>
+      @for (m of modulos; track m) {
+        <button
+          type="button"
+          class="btn btn-sm"
+          [class.btn-primary]="filtroModulo() === m"
+          [class.btn-outline]="filtroModulo() !== m"
+          (click)="filtroModulo.set(m)">
+          {{ m === 'todos' ? 'Todos' : m }}
+        </button>
+      }
+    </div>
+
+    <div class="toolbar">
+      <span class="toolbar-label">Nivel:</span>
+      @for (n of ['todos', 'info', 'warn', 'error', 'success']; track n) {
+        <button
+          type="button"
+          class="btn btn-sm"
+          [class.btn-primary]="filtroNivel() === n"
+          [class.btn-outline]="filtroNivel() !== n"
+          (click)="filtroNivel.set($any(n))">
+          {{ n === 'todos' ? 'Todos' : (n | uppercase) }}
+        </button>
+      }
+    </div>
+
+    @if (logsFiltrados().length === 0) {
+      <app-empty-state titulo="Sin logs" descripcion="No hay entradas para el filtro seleccionado." />
+    } @else {
+      <section class="panel terminal-panel">
+        <div class="terminal-header mono">
+          <span>root@netguard-soc</span>
+          <span class="blink">_</span>
+        </div>
+        <div class="terminal-body">
+          @for (log of logsFiltrados(); track log.id) {
+            <div class="log-entry" [class]="'log-' + log.nivel">
+              <span class="log-ts">{{ log.timestamp | date:'yyyy-MM-dd HH:mm:ss' }}</span>
+              <span class="log-mod">[{{ log.modulo }}]</span>
+              <span class="log-msg">{{ log.mensaje }}</span>
+            </div>
+          }
+        </div>
+      </section>
+    }
+  </div>
+</app-page-shell>

@@ -1,0 +1,164 @@
+<div class="soc-layout" [class.sidebar-collapsed]="sidebarColapsado()">
+  @if (sidebarAbierto()) {
+    <div class="sidebar-overlay" (click)="toggleSidebar()" aria-hidden="true"></div>
+  }
+
+  <aside class="sidebar" [class.open]="sidebarAbierto()" [class.collapsed]="sidebarColapsado()">
+    <div class="sidebar-brand">
+      <div class="brand-icon"><span class="shield">⬡</span></div>
+      @if (!sidebarColapsado()) {
+        <div class="brand-text">
+          <strong>NetGuard SOC</strong>
+          <span class="brand-sub">VLAN Security Monitor</span>
+        </div>
+      }
+    </div>
+
+    <nav class="sidebar-nav" aria-label="Navegación principal">
+      @for (item of navItems; track item.ruta) {
+        @if (navVisible(item)) {
+          <a
+            class="nav-link"
+            [routerLink]="item.ruta"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: item.ruta === '/vision-general' }"
+            [appTooltip]="item.tip ?? item.etiqueta"
+            [tooltipPos]="sidebarColapsado() ? 'bottom' : 'top'">
+            <span class="nav-icon">{{ item.icono }}</span>
+            @if (!sidebarColapsado()) {
+              <span class="nav-label">{{ item.etiqueta }}</span>
+              @if (badgeCount(item); as count) {
+                <span class="nav-badge">{{ count }}</span>
+              }
+            } @else if (badgeCount(item); as count) {
+              <span class="nav-badge dot">{{ count }}</span>
+            }
+          </a>
+        }
+      }
+    </nav>
+
+    <div class="sidebar-footer">
+      @if (!sidebarColapsado()) {
+        <div class="sim-badge">
+          <span class="pulse-dot sim"></span>
+          MODO SIMULACIÓN
+        </div>
+        <div class="sys-status mono">
+          <div>SYS: <span class="ok">NOMINAL</span></div>
+          <div>IDS: <span [class]="metricas().intrusosDetectados ? 'warn' : 'ok'">
+            {{ metricas().intrusosDetectados ? 'ACTIVO' : 'OK' }}
+          </span></div>
+        </div>
+      }
+    </div>
+
+    <button
+      type="button"
+      class="sidebar-collapse-btn"
+      (click)="ux.toggleSidebarColapsado()"
+      [appTooltip]="sidebarColapsado() ? 'Expandir menú' : 'Colapsar menú'"
+      aria-label="Colapsar sidebar">
+      {{ sidebarColapsado() ? '»' : '«' }}
+    </button>
+  </aside>
+
+  <div class="main-wrapper">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button
+          type="button"
+          class="btn btn-icon btn-outline menu-btn"
+          (click)="toggleSidebar()"
+          appTooltip="Menú de navegación"
+          aria-label="Abrir menú">
+          ☰
+        </button>
+        <nav class="breadcrumbs" aria-label="Ruta actual">
+          <span class="crumb-dim">NetGuard</span>
+          <span class="crumb-sep" aria-hidden="true">/</span>
+          <strong>{{ tituloPagina() }}</strong>
+        </nav>
+      </div>
+
+      <div class="topbar-center" [class]="estadoGlobalClass()" title="Estado global de seguridad">
+        <span class="global-dot" aria-hidden="true"></span>
+        <span class="global-label mono">{{ etiquetaEstadoGlobal() }}</span>
+      </div>
+
+      <div class="topbar-right">
+        <button
+          type="button"
+          class="btn btn-outline btn-sm search-btn"
+          (click)="abrirBusqueda()"
+          appTooltip="Búsqueda global (Ctrl+K)">
+          ⌕ Buscar
+        </button>
+        <app-notification-center />
+        @if (auth.puede('write')) {
+          <button
+            type="button"
+            class="btn btn-outline btn-sm"
+            [disabled]="escaneando()"
+            (click)="escanearRed()"
+            appTooltip="Escaneo activo de red simulado">
+            @if (escaneando()) { ⟳ Escaneando... } @else { ⟳ Escanear red }
+          </button>
+        }
+
+        <div class="traffic-pill mono" appTooltip="Tráfico agregado simulado">
+          <span class="traffic-wave" aria-hidden="true"></span>
+          {{ metricas().traficoTotalMbps }} Mbps
+        </div>
+
+        <div class="user-block-wrap">
+          <button
+            type="button"
+            class="user-block"
+            (click)="toggleUserPanel()"
+            appTooltip="Perfil y preferencias"
+            aria-haspopup="true"
+            [attr.aria-expanded]="userPanel()?.abierto()">
+            <div class="user-info">
+              <span class="user-name">{{ profile.nombreMostrado() }}</span>
+              <span class="user-role">{{ profile.rolMostrado() }}</span>
+            </div>
+            <div class="avatar">{{ profile.avatarMostrado() }}</div>
+          </button>
+          <app-user-panel />
+        </div>
+      </div>
+    </header>
+
+    <main class="dashboard-content" id="main-content">
+      <router-outlet />
+    </main>
+  </div>
+
+  <button
+    type="button"
+    class="help-fab"
+    (click)="help.toggle()"
+    appTooltip="Ayuda y soporte"
+    aria-label="Abrir panel de ayuda">
+    ?
+  </button>
+
+  <button
+    type="button"
+    class="ai-fab"
+    [class.ai-fab-active]="ai.abierto()"
+    (click)="toggleAi($event)"
+    appTooltip="Cyber AI Assistant"
+    aria-label="Asistente IA SOC"
+    [attr.aria-expanded]="ai.abierto()">
+    ◆
+  </button>
+
+  <app-help-panel />
+  <app-soc-ai-assistant />
+  <app-global-search />
+  <app-onboarding-tour />
+  <app-toast-container />
+  <app-confirm-dialog />
+</div>

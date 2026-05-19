@@ -1,0 +1,178 @@
+<app-page-shell [useSkeleton]="true" loaderMessage="Cargando centro de configuración...">
+  <div class="page">
+    <header class="page-header">
+      <div>
+        <h1 class="page-title">Centro de configuración</h1>
+        <p class="page-subtitle">Parámetros SOC · persistencia local · impacto en simulación en vivo</p>
+      </div>
+      @if (puedeEditar()) {
+        <div class="commit-actions">
+          @if (configSvc.tienePendientes()) {
+            <span class="pending-changes">Cambios sin aplicar</span>
+          }
+          <button type="button" class="btn btn-outline btn-sm" [disabled]="!configSvc.tienePendientes()" (click)="descartar()">
+            Descartar
+          </button>
+          <button type="button" class="btn btn-primary btn-sm" [disabled]="!configSvc.tienePendientes()" (click)="aplicar()">
+            Aplicar cambios
+          </button>
+        </div>
+      } @else {
+        <span class="chip chip-warn">Solo lectura (requiere rol admin)</span>
+      }
+    </header>
+
+    <div class="settings-layout">
+      <aside class="settings-nav panel">
+        <ul>
+          @for (s of secciones; track s.id) {
+            <li>
+              <button
+                type="button"
+                class="nav-item"
+                [class.active]="seccionActiva() === s.id"
+                (click)="seleccionar(s.id)">
+                <span class="nav-icon">{{ s.icon }}</span>
+                {{ s.label }}
+              </button>
+            </li>
+          }
+        </ul>
+        <div class="nav-hint">
+          <strong>Sensibilidad actual</strong>
+          <span class="mono">{{ configSvc.valorActual('sensibilidad') | uppercase }}</span>
+          <small>Factor ×{{ configSvc.factorSensibilidad() }}</small>
+        </div>
+      </aside>
+
+      <div class="settings-content panel">
+        @switch (seccionActiva()) {
+          @case ('red') {
+            <div class="panel-header"><h3>Configuración de red</h3></div>
+            <div class="panel-body form-grid">
+              <label>
+                Rango monitoreado (CIDR)
+                <input type="text" class="form-control mono" [value]="red.rangoMonitoreo" [disabled]="!puedeEditar()"
+                  (input)="setRango($any($event.target).value)" />
+              </label>
+              <label>
+                Gateway principal
+                <input type="text" class="form-control mono" [value]="red.gatewayPrincipal" [disabled]="!puedeEditar()"
+                  (input)="setGateway($any($event.target).value)" />
+              </label>
+              <label>
+                Intervalo escaneo (seg)
+                <input type="number" class="form-control" min="10" max="120" [value]="red.intervaloEscaneoSeg"
+                  [disabled]="!puedeEditar()" (input)="setIntervaloEscaneo(+$any($event.target).value)" />
+              </label>
+              <p class="help-text">VLAN cuarentena fija: <span class="mono">999</span> (integrada con políticas)</p>
+            </div>
+          }
+          @case ('monitoreo') {
+            <div class="panel-header"><h3>Monitoreo y dashboard</h3></div>
+            <div class="panel-body form-grid">
+              <label class="toggle-row">
+                <input type="checkbox" [checked]="monitoreo.simularTraficoEnVivo" [disabled]="!puedeEditar()"
+                  (change)="toggleTrafico($any($event.target).checked)" />
+                Simular tráfico en vivo
+              </label>
+              <label class="toggle-row">
+                <input type="checkbox" [checked]="monitoreo.mostrarTopologiaAnimada" [disabled]="!puedeEditar()"
+                  (change)="toggleTopologia($any($event.target).checked)" />
+                Animación en topología
+              </label>
+              <label>
+                Refresco dashboard (seg)
+                <input type="number" class="form-control" min="3" max="30" [value]="monitoreo.refrescoDashboardSeg"
+                  [disabled]="!puedeEditar()" (input)="setRefresco(+$any($event.target).value)" />
+              </label>
+            </div>
+          }
+          @case ('alertas') {
+            <div class="panel-header"><h3>Alertas y notificaciones</h3></div>
+            <div class="panel-body form-grid">
+              <label class="toggle-row">
+                <input type="checkbox" [checked]="alertas.notificacionesToast" [disabled]="!puedeEditar()"
+                  (change)="toggleToast($any($event.target).checked)" />
+                Toasts en pantalla
+              </label>
+              <label class="toggle-row">
+                <input type="checkbox" [checked]="alertas.sonidoAlertas" [disabled]="!puedeEditar()"
+                  (change)="toggleSonido($any($event.target).checked)" />
+                Sonido en alertas críticas
+              </label>
+              <label class="toggle-row">
+                <input type="checkbox" [checked]="alertas.umbralCriticoAuto" [disabled]="!puedeEditar()"
+                  (change)="toggleUmbral($any($event.target).checked)" />
+                Escalar a crítico automáticamente
+              </label>
+            </div>
+          }
+          @case ('simulacion') {
+            <div class="panel-header"><h3>Simulación SOC</h3></div>
+            <div class="panel-body form-grid">
+              <label class="toggle-row">
+                <input type="checkbox" [checked]="simulacion.generarLogsAutomaticos" [disabled]="!puedeEditar()"
+                  (change)="toggleLogsAuto($any($event.target).checked)" />
+                Generar logs automáticos
+              </label>
+              <label class="toggle-row">
+                <input type="checkbox" [checked]="simulacion.autoCuarentena" [disabled]="!puedeEditar()"
+                  (change)="toggleAutoCuarentena($any($event.target).checked)" />
+                Cuarentena automática (políticas + IDS)
+              </label>
+              <label>
+                Frecuencia eventos (seg)
+                <input type="number" class="form-control" min="4" max="30" [value]="simulacion.frecuenciaEventosSeg"
+                  [disabled]="!puedeEditar()" (input)="setFrecuencia(+$any($event.target).value)" />
+              </label>
+              <p class="help-text">Los cambios se reflejan en dashboard, alertas y auditoría tras aplicar.</p>
+            </div>
+          }
+          @case ('sensibilidad') {
+            <div class="panel-header"><h3>Sensibilidad de detección IDS</h3></div>
+            <div class="panel-body">
+              <div class="sens-grid">
+                @for (nivel of ['baja', 'media', 'alta']; track nivel) {
+                  <button
+                    type="button"
+                    class="sens-card"
+                    [class.active]="configSvc.valorActual('sensibilidad') === nivel"
+                    [disabled]="!puedeEditar()"
+                    (click)="setSensibilidad($any(nivel))">
+                    <strong>{{ nivel | titlecase }}</strong>
+                    <small>
+                      @switch (nivel) {
+                        @case ('baja') { Menos alertas simuladas }
+                        @case ('media') { Equilibrio operativo }
+                        @case ('alta') { Máxima detección · más ruido }
+                      }
+                    </small>
+                  </button>
+                }
+              </div>
+            </div>
+          }
+          @case ('tema') {
+            <div class="panel-header"><h3>Apariencia</h3></div>
+            <div class="panel-body">
+              <div class="theme-row">
+              @for (t of themeSvc.temas; track t.id) {
+                <button type="button" class="theme-btn" [class.active]="themeSvc.prefs().tema === t.id"
+                  (click)="setTema(t.id)">{{ t.icon }} {{ t.label }}</button>
+              }
+              </div>
+              <span class="accent-label">Color principal</span>
+              <div class="accent-row">
+                @for (a of themeSvc.acentos; track a.id) {
+                  <button type="button" class="accent-dot" [style.background]="a.hex"
+                    [class.active]="themeSvc.prefs().acento === a.id" (click)="themeSvc.setAcento(a.id)"></button>
+                }
+              </div>
+            </div>
+          }
+        }
+      </div>
+    </div>
+  </div>
+</app-page-shell>

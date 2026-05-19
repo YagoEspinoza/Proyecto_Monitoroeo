@@ -1,8 +1,10 @@
+import { RolUsuario } from '../constants/roles.constants';
+
 export interface Usuario {
   _id: string;
   nombre: string;
   correo: string;
-  rol: 'admin' | 'operador' | 'visor';
+  rol: RolUsuario;
 }
 
 export interface LoginRequest {

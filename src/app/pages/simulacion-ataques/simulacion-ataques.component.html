@@ -1,0 +1,55 @@
+<app-page-shell>
+  <div class="page">
+    <header class="page-header">
+      <div>
+        <h1 class="page-title">Laboratorio de Ataques</h1>
+        <p class="page-subtitle">Simulación avanzada IDS/IPS — entorno controlado</p>
+      </div>
+      <button type="button" class="btn btn-outline btn-sm" (click)="consultarAi()">◆ Consultar AI</button>
+    </header>
+
+    @if (sim.estado().activa) {
+      <section class="sim-progress panel">
+        <div class="panel-header">
+          <span class="panel-title">Simulación en curso</span>
+          <button type="button" class="btn btn-outline btn-sm" (click)="sim.detener()">Detener</button>
+        </div>
+        <div class="panel-body">
+          <p class="mono">{{ sim.estado().fase }}</p>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" [style.width.%]="sim.estado().progreso"></div>
+          </div>
+        </div>
+      </section>
+    }
+
+    <div class="attack-grid">
+      @for (a of sim.ataques; track a.id) {
+        <article class="attack-card panel" [class]="'sev-' + a.severidad">
+          <span class="attack-icon">{{ a.icono }}</span>
+          <h3>{{ a.nombre }}</h3>
+          <p>{{ a.descripcion }}</p>
+          <span class="attack-meta mono">{{ a.duracionSeg }}s · {{ a.severidad }}</span>
+          <button
+            type="button"
+            class="btn btn-primary btn-sm"
+            [disabled]="sim.estado().activa"
+            (click)="lanzar(a)">
+            Ejecutar simulación
+          </button>
+        </article>
+      }
+    </div>
+
+    <section class="panel sim-info">
+      <div class="panel-header"><span class="panel-title">Flujo de respuesta automática</span></div>
+      <ol class="sim-flow">
+        <li>Generación de tráfico malicioso simulado</li>
+        <li>Detección por motor IDS</li>
+        <li>Creación de alerta y notificación</li>
+        <li>Recomendación del Cyber AI Assistant</li>
+        <li>Registro en auditoría</li>
+      </ol>
+    </section>
+  </div>
+</app-page-shell>

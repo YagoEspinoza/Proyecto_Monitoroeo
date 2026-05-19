@@ -1,0 +1,56 @@
+<app-page-shell [useSkeleton]="true">
+  <div class="page">
+    <header class="page-header">
+      <div>
+        <h1 class="page-title">Centro de alertas IDS/IPS</h1>
+        <p class="page-subtitle">Detección de intrusos y respuesta automatizada VLAN</p>
+      </div>
+      <button type="button" class="btn btn-primary btn-sm" (click)="reconocerTodas()">
+        Reconocer todas
+      </button>
+    </header>
+
+    @if (mock.alertas().length === 0) {
+      <app-empty-state icono="✓" titulo="Sin alertas" descripcion="No hay eventos de seguridad registrados." />
+    } @else {
+      <div class="alertas-grid">
+        @for (a of mock.alertas(); track a.id) {
+          <article class="alerta-panel" [class]="'nivel-' + a.nivel" [class.dim]="a.reconocida">
+            <div class="alerta-head">
+              <span class="nivel">{{ etiquetaNivel(a.nivel) }}</span>
+              <span class="mono id">{{ a.id }}</span>
+              <span class="time">{{ a.tiempo }}</span>
+            </div>
+            <p class="msg">{{ a.mensaje }}</p>
+            <div class="meta mono">
+              <span>{{ a.ip }}</span>
+              @if (a.puerto) { <span>:{{ a.puerto }}</span> }
+              @if (a.vlan) { <span class="vlan">VLAN {{ a.vlan }}</span> }
+            </div>
+            <div class="btns">
+              <button type="button" class="btn btn-outline btn-sm" (click)="detalle.set(a)">Detalle</button>
+              @if (!a.reconocida) {
+                <button type="button" class="btn btn-success btn-sm" (click)="reconocer(a)">Reconocer</button>
+                @if (a.nivel === 'critico' || a.nivel === 'alto') {
+                  <button type="button" class="btn btn-danger btn-sm" (click)="aislarDesdeAlerta(a)">Aislar host</button>
+                }
+              }
+            </div>
+          </article>
+        }
+      </div>
+    }
+  </div>
+</app-page-shell>
+
+<app-modal [abierto]="!!detalle()" titulo="Detalle de alerta" (cerrar)="detalle.set(null)">
+  @if (detalle(); as a) {
+    <dl class="detail-list">
+      <dt>ID</dt><dd class="mono">{{ a.id }}</dd>
+      <dt>Nivel</dt><dd>{{ etiquetaNivel(a.nivel) }}</dd>
+      <dt>Origen</dt><dd class="mono">{{ a.ip }}</dd>
+      <dt>Mensaje</dt><dd>{{ a.mensaje }}</dd>
+      <dt>VLAN</dt><dd>{{ a.vlan ?? '—' }}</dd>
+    </dl>
+  }
+</app-modal>

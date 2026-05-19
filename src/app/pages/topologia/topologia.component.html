@@ -1,0 +1,99 @@
+<app-page-shell [useSkeleton]="true">
+  <div class="page">
+    <header class="page-header">
+      <div>
+        <h1 class="page-title">Topología de red</h1>
+        <p class="page-subtitle">Mapa lógico capa 3 · estado de seguridad por nodo</p>
+      </div>
+      <div class="map-controls">
+        <button type="button" class="btn btn-outline btn-sm" (click)="zoomIn()">+ Zoom</button>
+        <button type="button" class="btn btn-outline btn-sm" (click)="zoomOut()">− Zoom</button>
+        <button type="button" class="btn btn-outline btn-sm" (click)="centrar()">◎ Centrar</button>
+      </div>
+    </header>
+
+    <div class="topology-layout">
+      <section class="panel map-panel">
+        <div class="panel-header">
+          <span class="panel-title">Lienzo de red</span>
+          <span class="panel-badge mono">LIVE · simulado</span>
+        </div>
+        <div class="canvas-wrap">
+          <div class="scan-line"></div>
+          <svg
+            class="topology-svg"
+            viewBox="0 0 100 100"
+            preserveAspectRatio="xMidYMid meet"
+            [style.transform]="'scale(' + zoom() + ')'">
+            @for (e of mock.enlacesTopologia(); track e.desde + e.hasta) {
+              @if (linea(e); as l) {
+                <line
+                  [attr.x1]="l.x1"
+                  [attr.y1]="l.y1"
+                  [attr.x2]="l.x2"
+                  [attr.y2]="l.y2"
+                  class="link"
+                  [class.inactive]="!e.activo"
+                  [class.traffic-pulse]="enlaceActivo(e)" />
+              }
+            }
+            @for (n of mock.nodosTopologia(); track n.id) {
+              <g
+                class="node"
+                [attr.transform]="'translate(' + n.x + ',' + n.y + ')'"
+                (click)="seleccionar(n)">
+                <circle
+                  r="5"
+                  [attr.fill]="colorSeguridad(n.seguridad)"
+                  [class.pulse]="n.seguridad === 'intruso'"
+                  [class.offline]="!esOnline(n)" />
+                <text y="-7" text-anchor="middle" class="node-label">{{ n.label }}</text>
+              </g>
+            }
+          </svg>
+        </div>
+        <div class="legend">
+          <span><i class="dot seguro"></i> Seguro</span>
+          <span><i class="dot alerta"></i> Alerta</span>
+          <span><i class="dot intruso"></i> Intruso</span>
+          <span><i class="dot aislado"></i> Aislado</span>
+        </div>
+      </section>
+
+      <aside class="panel side-panel">
+        <div class="panel-header">
+          <span class="panel-title">Detalle de nodo</span>
+        </div>
+        <div class="panel-body">
+          @if (nodoSeleccionado(); as n) {
+            <div class="node-detail">
+              <h3>{{ n.label }}</h3>
+              <p class="mono">{{ n.ip }}</p>
+              <p>Tipo: {{ n.tipo }}</p>
+              <span class="badge" [class]="'badge-' + n.seguridad">{{ n.seguridad }}</span>
+            </div>
+          } @else {
+            <p class="hint">Selecciona un nodo en el mapa para ver detalles.</p>
+          }
+        </div>
+
+        <div class="nodes-list">
+          <h4>Salud de dispositivos</h4>
+          @for (n of mock.nodosTopologia(); track n.id) {
+            <button
+              type="button"
+              class="node-card"
+              [class.active]="nodoSeleccionado()?.id === n.id"
+              (click)="seleccionar(n)">
+              <span class="nc-dot" [style.background]="colorSeguridad(n.seguridad)"></span>
+              <div>
+                <strong>{{ n.label }}</strong>
+                <small class="mono">{{ n.ip }}</small>
+              </div>
+            </button>
+          }
+        </div>
+      </aside>
+    </div>
+  </div>
+</app-page-shell>

@@ -1,0 +1,46 @@
+.attack-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.attack-card {
+  padding: 20px;
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.attack-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glow);
+}
+
+.attack-icon { font-size: 2rem; display: block; margin-bottom: 8px; }
+.attack-card h3 { margin: 0 0 8px; font-size: 1rem; }
+.attack-card p { color: var(--text-secondary); font-size: 0.85rem; margin: 0 0 12px; }
+.attack-meta { font-size: 0.72rem; color: var(--text-muted); display: block; margin-bottom: 12px; }
+.attack-card.sev-critica { border-left: 3px solid var(--color-alert); }
+.attack-card.sev-alta { border-left: 3px solid var(--color-warn); }
+
+.progress-bar-bg {
+  height: 8px;
+  background: var(--bg-elevated);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 12px;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-brand), var(--color-brand-dim));
+  transition: width 0.4s ease;
+}
+
+.sim-flow {
+  padding: 16px 16px 16px 32px;
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.8;
+}
+
+.sim-info { margin-top: 8px; }

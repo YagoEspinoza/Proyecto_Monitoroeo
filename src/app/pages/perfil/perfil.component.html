@@ -1,0 +1,79 @@
+<app-page-shell>
+  <div class="page perfil-page">
+    <header class="page-header">
+      <div class="perfil-hero">
+        <span class="perfil-avatar-lg">{{ profile.avatarMostrado() }}</span>
+        <div>
+          <h1 class="page-title">{{ profile.nombreMostrado() }}</h1>
+          <p class="page-subtitle">{{ auth.usuario()?.correo }} · {{ profile.rolMostrado() }}</p>
+        </div>
+      </div>
+    </header>
+
+    <nav class="perfil-tabs">
+      <button type="button" [class.active]="tab() === 'perfil'" (click)="tab.set('perfil')">Perfil</button>
+      <button type="button" [class.active]="tab() === 'password'" (click)="tab.set('password')">Contraseña</button>
+      <button type="button" [class.active]="tab() === 'actividad'" (click)="tab.set('actividad')">Actividad</button>
+      <button type="button" [class.active]="tab() === 'auditoria'" (click)="tab.set('auditoria')">Mi auditoría</button>
+    </nav>
+
+    @switch (tab()) {
+      @case ('perfil') {
+        <section class="panel">
+          <div class="panel-body form-grid">
+            <label>Nombre <input type="text" [(ngModel)]="nombreEdit" /></label>
+            <span class="field-label">Avatar</span>
+            <div class="avatar-grid">
+              @for (a of profile.avataresDisponibles; track a) {
+                <button type="button" class="av-btn" [class.active]="profile.perfil().avatar === a" (click)="profile.setAvatar(a)">{{ a }}</button>
+              }
+            </div>
+            <button type="button" class="btn btn-primary" (click)="guardarNombre()">Guardar perfil</button>
+          </div>
+        </section>
+      }
+      @case ('password') {
+        <section class="panel">
+          <div class="panel-body form-grid">
+            <label>Contraseña actual <input type="password" [(ngModel)]="passActual" autocomplete="current-password" /></label>
+            <label>Nueva contraseña <input type="password" [(ngModel)]="passNueva" autocomplete="new-password" /></label>
+            <label>Confirmar <input type="password" [(ngModel)]="passConfirm" autocomplete="new-password" /></label>
+            <button type="button" class="btn btn-primary" [disabled]="cambiandoPass()" (click)="cambiarPassword()">
+              {{ cambiandoPass() ? 'Guardando...' : 'Cambiar contraseña' }}
+            </button>
+          </div>
+        </section>
+      }
+      @case ('actividad') {
+        <section class="panel">
+          <div class="panel-header"><span class="panel-title">Historial de actividad</span></div>
+          <div class="activity-list">
+            @for (a of activity.actividades(); track a.id) {
+              <div class="activity-row">
+                <span class="mono dim">{{ a.timestamp | date:'dd/MM HH:mm:ss' }}</span>
+                <span class="act-type">{{ a.tipo }}</span>
+                <span>{{ a.descripcion }}</span>
+              </div>
+            } @empty {
+              <p class="empty-msg">Sin actividad registrada aún</p>
+            }
+          </div>
+        </section>
+      }
+      @case ('auditoria') {
+        <section class="panel">
+          <div class="panel-header"><span class="panel-title">Acciones auditadas (sesión)</span></div>
+          <div class="activity-list">
+            @for (r of audit.registros().slice(0, 30); track r.id) {
+              <div class="activity-row" [class.critico]="r.critico">
+                <span class="mono dim">{{ r.timestamp | date:'dd/MM HH:mm:ss' }}</span>
+                <span>{{ r.accion }} · {{ r.modulo }}</span>
+                <span>{{ r.detalle }}</span>
+              </div>
+            }
+          </div>
+        </section>
+      }
+    }
+  </div>
+</app-page-shell>

@@ -1,0 +1,237 @@
+<app-page-shell [useSkeleton]="true" loaderMessage="Inicializando monitoreo SOC...">
+  <div class="page">
+    <header class="page-header">
+      <div>
+        <h1 class="page-title">Centro de Operaciones de Seguridad</h1>
+        <p class="page-subtitle">// live feed — {{ mock.reloj() | date:'dd/MM/yyyy HH:mm:ss' }}</p>
+      </div>
+      <div class="header-actions">
+        <span class="chip chip-ok"><span class="pulse-dot"></span> Motor IDS activo</span>
+        <a routerLink="/politicas" class="chip chip-policy mono">
+          {{ mock.metricas().politicasActivas }} políticas · {{ mock.metricas().impactosPoliticas }} impactos
+        </a>
+        <span class="chip mono">IDS {{ config.sensibilidad() | uppercase }} (×{{ config.factorSensibilidad() }})</span>
+        <button type="button" class="btn btn-outline btn-sm" (click)="layout.toggleEdicion()">
+          {{ layout.modoEdicion() ? '✓ Listo' : '⊞ Personalizar' }}
+        </button>
+        <a routerLink="/configuracion" class="btn btn-outline btn-sm">Configuración</a>
+        <a routerLink="/vlan-cuarentena" class="btn btn-danger btn-sm">
+          Cuarentena ({{ mock.metricas().enCuarentena }})
+        </a>
+      </div>
+    </header>
+
+    <div class="kpi-grid">
+      <app-kpi-card
+        etiqueta="Dispositivos activos"
+        [valor]="mock.metricas().dispositivosActivos"
+        [sufijo]="'/' + mock.metricas().dispositivosTotal"
+        subtitulo="Nodos monitoreados"
+        icono="◈"
+        accent="#10b981"
+        [porcentaje]="(mock.metricas().dispositivosActivos / mock.metricas().dispositivosTotal) * 100" />
+      <app-kpi-card
+        etiqueta="Alertas críticas"
+        [valor]="mock.metricas().alertasCriticas"
+        [subtitulo]="mock.metricas().alertasPendientes + ' pendientes'"
+        icono="!"
+        accent="#ef4444" />
+      <app-kpi-card
+        etiqueta="Intrusos detectados"
+        [valor]="mock.metricas().intrusosDetectados"
+        subtitulo="Requieren aislamiento VLAN"
+        icono="⚠"
+        accent="#f59e0b" />
+      <app-kpi-card
+        etiqueta="Uptime promedio"
+        [valor]="mock.metricas().uptimePromedio"
+        sufijo="%"
+        subtitulo="Disponibilidad de red"
+        icono="↑"
+        accent="#38bdf8" />
+    </div>
+
+    @if (layout.modoEdicion()) {
+      <p class="edit-hint mono">Modo edición: usa ↑↓ en cada panel para reordenar widgets</p>
+    }
+
+    @if (widgetVisible('chart-trafico') || widgetVisible('chart-alertas')) {
+      <div class="charts-row" [class.editing]="layout.modoEdicion()">
+        @if (widgetVisible('chart-trafico')) {
+          <section class="panel chart-panel" [class.half]="widgetVisible('chart-alertas')">
+            @if (layout.modoEdicion()) {
+              <div class="widget-controls">
+                <button type="button" class="btn btn-icon btn-outline btn-sm" (click)="moverWidget('chart-trafico', -1)">↑</button>
+                <button type="button" class="btn btn-icon btn-outline btn-sm" (click)="moverWidget('chart-trafico', 1)">↓</button>
+              </div>
+            }
+            <div class="panel-header"><span class="panel-title">Tráfico en tiempo real</span></div>
+            <div class="panel-body"><app-chart-widget tipo="trafico" /></div>
+          </section>
+        }
+        @if (widgetVisible('chart-alertas')) {
+          <section class="panel chart-panel" [class.half]="widgetVisible('chart-trafico')">
+            @if (layout.modoEdicion()) {
+              <div class="widget-controls">
+                <button type="button" class="btn btn-icon btn-outline btn-sm" (click)="moverWidget('chart-alertas', -1)">↑</button>
+                <button type="button" class="btn btn-icon btn-outline btn-sm" (click)="moverWidget('chart-alertas', 1)">↓</button>
+              </div>
+            }
+            <div class="panel-header"><span class="panel-title">Distribución de alertas</span></div>
+            <div class="panel-body"><app-chart-widget tipo="alertas" /></div>
+          </section>
+        }
+      </div>
+    }
+
+    <div class="security-banner" [class]="'banner-' + mock.metricas().estadoGlobal">
+      <div class="banner-left">
+        <span class="banner-icon">⬡</span>
+        <div>
+          <strong>Estado de seguridad de la red</strong>
+          <p>Segmentación VLAN · detección y aislamiento automático</p>
+        </div>
+      </div>
+      <app-status-badge [estado]="mock.metricas().estadoGlobal" />
+    </div>
+
+    @if (policies.ultimosImpactos().length) {
+      <section class="panel policy-impact-panel">
+        <div class="panel-header">
+          <span class="panel-title">Impacto reciente de políticas</span>
+          <a routerLink="/politicas" class="btn btn-outline btn-sm">Gestionar</a>
+        </div>
+        <div class="impact-list">
+          @for (imp of policies.ultimosImpactos().slice(0, 4); track imp.id) {
+            <div class="impact-row">
+              <span class="mono dim">{{ imp.timestamp | date:'HH:mm:ss' }}</span>
+              <strong>{{ imp.politicaNombre }}</strong>
+              <span>{{ imp.descripcion }}</span>
+            </div>
+          }
+        </div>
+      </section>
+    }
+
+    <div class="grid-2">
+      <section class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Dispositivos conectados</span>
+          <a routerLink="/dispositivos" class="btn btn-outline btn-sm">Ver todos</a>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Host</th>
+                <th>IP / VLAN</th>
+                <th>Seguridad</th>
+                <th>Latencia</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (d of mock.dispositivos().slice(0, 6); track d.id) {
+                <tr>
+                  <td><span class="host-icon">{{ iconoTipo(d.tipo) }}</span> <strong>{{ d.nombre }}</strong></td>
+                  <td class="mono">{{ d.ip }}<br /><span class="dim">VLAN {{ d.vlan }}</span></td>
+                  <td><app-status-badge [estado]="d.seguridad" /></td>
+                  <td class="mono">@if (d.latencia !== null) { {{ d.latencia }}ms } @else { — }</td>
+                  <td><button type="button" class="btn btn-outline btn-sm" (click)="verDispositivo(d)">Detalle</button></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Alertas de intrusos</span>
+          <span class="panel-badge alert-badge">{{ mock.metricas().alertasPendientes }} nuevas</span>
+        </div>
+        <div class="alertas-feed">
+          @for (a of mock.alertas().slice(0, 5); track a.id) {
+            <article class="alerta-card" [class]="'nivel-' + a.nivel" [class.reconocida]="a.reconocida">
+              <div class="alerta-top">
+                <span class="nivel-tag">{{ etiquetaNivel(a.nivel) }}</span>
+                <span class="mono dim">{{ a.id }}</span>
+                <span class="tiempo">{{ a.tiempo }}</span>
+              </div>
+              <p>{{ a.mensaje }}</p>
+              <div class="alerta-actions">
+                <span class="mono dim">{{ a.ip }} · VLAN {{ a.vlan }}</span>
+                @if (!a.reconocida) {
+                  <button type="button" class="btn btn-success btn-sm" (click)="reconocer(a.id)">Reconocer</button>
+                }
+              </div>
+            </article>
+          }
+        </div>
+      </section>
+    </div>
+
+    <div class="grid-2">
+      <section class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Tráfico por VLAN</span>
+          <span class="panel-badge">Simulado en vivo</span>
+        </div>
+        <div class="panel-body trafico-list">
+          @for (v of mock.vlans(); track v.id) {
+            @if (v.id !== 999) {
+              <div class="trafico-row">
+                <div class="trafico-meta">
+                  <span>VLAN {{ v.id }} — {{ v.nombre }}</span>
+                  <span class="mono" [style.color]="v.color">{{ v.traficoMbps | number:'1.0-0' }} Mbps</span>
+                </div>
+                <div class="traffic-bar-bg">
+                  <div class="traffic-bar-fill"
+                    [style.width.%]="porcentajeTrafico(v.traficoMbps, v.maxMbps)"
+                    [style.background]="v.color"></div>
+                </div>
+              </div>
+            }
+          }
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Logs recientes</span>
+          <a routerLink="/auditoria" class="btn btn-outline btn-sm">Ver auditoría</a>
+        </div>
+        <div class="logs-mini">
+          @for (log of mock.logs().slice(0, 6); track log.id) {
+            <div class="log-line" [class]="'log-' + log.nivel">
+              <span class="log-time mono">{{ log.timestamp | date:'HH:mm:ss' }}</span>
+              <span class="log-mod mono">[{{ log.modulo }}]</span>
+              <span>{{ log.mensaje }}</span>
+            </div>
+          }
+        </div>
+      </section>
+    </div>
+  </div>
+</app-page-shell>
+
+<app-modal [abierto]="!!modalDispositivo()" [titulo]="modalDispositivo()?.nombre ?? 'Dispositivo'" (cerrar)="cerrarModal()">
+  @if (modalDispositivo(); as d) {
+    <dl class="detail-list">
+      <dt>IP</dt><dd class="mono">{{ d.ip }}</dd>
+      <dt>MAC</dt><dd class="mono">{{ d.mac }}</dd>
+      <dt>VLAN</dt><dd>{{ d.vlan }}</dd>
+      <dt>Ubicación</dt><dd>{{ d.ubicacion }}</dd>
+      <dt>Estado</dt><dd><app-status-badge [estado]="d.estado" /></dd>
+      <dt>Seguridad</dt><dd><app-status-badge [estado]="d.seguridad" /></dd>
+    </dl>
+  }
+  <div footer>
+    @if (modalDispositivo(); as d) {
+      @if (d.seguridad === 'intruso' || d.seguridad === 'alerta') {
+        <button type="button" class="btn btn-danger" (click)="aislar(d)">Aislar en cuarentena</button>
+      }
+      <button type="button" class="btn btn-outline" (click)="cerrarModal()">Cerrar</button>
+    }
+  </div>
+</app-modal>

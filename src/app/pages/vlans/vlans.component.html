@@ -1,0 +1,33 @@
+<app-page-shell [useSkeleton]="true">
+  <div class="page">
+    <header class="page-header">
+      <div>
+        <h1 class="page-title">VLANs activas</h1>
+        <p class="page-subtitle">Segmentación de red · políticas de aislamiento por capa</p>
+      </div>
+      <a routerLink="/vlan-cuarentena" class="btn btn-danger btn-sm">Ver cuarentena</a>
+    </header>
+
+    <div class="vlan-grid">
+      @for (v of vlansActivas(); track v.id) {
+        <article class="vlan-card" [style.--vlan-color]="v.color">
+          <div class="vlan-top">
+            <span class="vlan-id mono">VLAN {{ v.id }}</span>
+            <app-status-badge [estado]="estadoVlan(v.estado)" />
+          </div>
+          <h3>{{ v.nombre }}</h3>
+          <p class="rango mono">{{ v.rango }}</p>
+          <div class="vlan-stats">
+            <div><span class="lbl">Gateway</span><span class="mono">{{ v.gateway }}</span></div>
+            <div><span class="lbl">Hosts</span><span>{{ v.dispositivos }}</span></div>
+            <div><span class="lbl">Tráfico</span><span [style.color]="v.color">{{ v.traficoMbps | number:'1.0-0' }} Mbps</span></div>
+          </div>
+          <div class="traffic-bar-bg">
+            <div class="traffic-bar-fill" [style.width.%]="porcentaje(v.traficoMbps, v.maxMbps)" [style.background]="v.color"></div>
+          </div>
+          <span class="pct mono">{{ porcentaje(v.traficoMbps, v.maxMbps) }}% capacidad</span>
+        </article>
+      }
+    </div>
+  </div>
+</app-page-shell>
