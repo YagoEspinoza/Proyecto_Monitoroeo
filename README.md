@@ -1,59 +1,80 @@
-# MyMonitoreo
+# My Monitoreo
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.8.
+Plataforma SOC para monitoreo de red con frontend Angular y API de reportes en Node.js + MongoDB.
 
-## Development server
+## Estructura del repositorio
 
-To start a local development server, run:
+```
+my-monitoreo/
+├── frontend/          # Aplicación Angular (NetGuard SOC)
+├── backend/           # API REST de reportes (Express + Mongoose)
+├── documentacion/     # Manuales, fases y reglas del proyecto
+└── README.md
+```
+
+## Requisitos
+
+- Node.js 20+
+- MongoDB 6+ (solo para el módulo de reportes)
+- npm
+
+## Frontend (Angular)
 
 ```bash
+cd frontend
+npm install
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Abrir [http://localhost:4200](http://localhost:4200).
 
-## Code scaffolding
+El módulo **Reportes** consume `http://localhost:3000/api/reports` en desarrollo.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Backend (reportes)
 
 ```bash
-ng generate --help
+cd backend
+cp .env.example .env
+npm install
+npm run dev
 ```
 
-## Building
+Variables en `.env`:
 
-To build the project run:
+| Variable       | Descripción                          |
+|----------------|--------------------------------------|
+| `PORT`         | Puerto HTTP (default `3000`)       |
+| `MONGODB_URI`  | Cadena de conexión MongoDB           |
+| `FRONTEND_URL` | Origen CORS (default `http://localhost:4200`) |
 
-```bash
-ng build
-```
+### Endpoints
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+| Método | Ruta                    | Descripción        |
+|--------|-------------------------|--------------------|
+| GET    | `/api/reports`          | Listar con filtros |
+| GET    | `/api/reports/:id`      | Detalle            |
+| POST   | `/api/reports`          | Crear              |
+| PUT    | `/api/reports/:id`      | Actualizar         |
+| DELETE | `/api/reports/:id`      | Eliminar           |
+| GET    | `/api/reports/:id/pdf`  | Descargar PDF      |
+| GET    | `/health`               | Estado del servicio |
 
-## Running unit tests
+## Desarrollo conjunto
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+1. Iniciar MongoDB local.
+2. `cd backend && npm run dev`
+3. `cd frontend && ng serve`
+4. Iniciar sesión en la app y abrir **Reportes**.
 
-```bash
-ng test
-```
+Si MongoDB o el backend no están disponibles, la vista muestra un aviso y mantiene las exportaciones mock existentes.
 
-## Running end-to-end tests
+## Calidad
 
-For end-to-end (e2e) testing, run:
+- Frontend: `cd frontend && npm run test:ci`
+- Backend: `cd backend && npm run lint`
 
-```bash
-ng e2e
-```
+SonarQube: ver `frontend/sonar-project.properties`.
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+## Documentación
 
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Ver carpeta [documentacion/](documentacion/README.md).

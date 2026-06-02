@@ -1,0 +1,215 @@
+<app-page-shell>
+  <div class="page">
+    <header class="page-header">
+      <div>
+        <h1 class="page-title">Reportes de eventos de red</h1>
+        <p class="page-subtitle">Registro, consulta y exportación PDF vía MongoDB</p>
+      </div>
+      <div class="header-actions">
+        <button type="button" class="btn btn-primary btn-sm" (click)="abrirCrear()" [disabled]="!backendDisponible()">
+          + Nuevo reporte
+        </button>
+      </div>
+    </header>
+
+    @if (!backendDisponible()) {
+      <div class="backend-alert panel" role="alert">
+        <strong>Servicio de reportes no disponible</strong>
+        <p>{{ errorBackend() }}</p>
+        <p class="hint">
+          Inicie MongoDB y el backend: <code>cd backend && npm run dev</code>. Las exportaciones mock siguen disponibles abajo.
+        </p>
+        <button type="button" class="btn btn-outline btn-sm" (click)="cargarReportes()">Reintentar conexión</button>
+      </div>
+    }
+
+    <section class="panel filters-panel">
+      <h2 class="section-title">Filtros</h2>
+      <form [formGroup]="filtros" class="filters-form" (ngSubmit)="cargarReportes()">
+        <label>Desde<input type="date" formControlName="from" /></label>
+        <label>Hasta<input type="date" formControlName="to" /></label>
+        <label>Tipo
+          <select formControlName="type">
+            <option value="">Todos</option>
+            @for (t of types; track t) {
+              <option [value]="t">{{ typeLabels[t] }}</option>
+            }
+          </select>
+        </label>
+        <label>Severidad
+          <select formControlName="severity">
+            <option value="">Todas</option>
+            @for (s of severities; track s) {
+              <option [value]="s">{{ severityLabels[s] }}</option>
+            }
+          </select>
+        </label>
+        <label>Estado
+          <select formControlName="status">
+            <option value="">Todos</option>
+            @for (st of statuses; track st) {
+              <option [value]="st">{{ statusLabels[st] }}</option>
+            }
+          </select>
+        </label>
+        <label>VLAN<input type="number" formControlName="vlanId" placeholder="ej. 10" /></label>
+        <label>Dispositivo (IP)<input formControlName="deviceIp" placeholder="192.168.1.10" /></label>
+        <div class="filter-actions">
+          <button type="submit" class="btn btn-primary btn-sm" [disabled]="cargando()">Aplicar</button>
+          <button type="button" class="btn btn-outline btn-sm" (click)="limpiarFiltros()">Limpiar</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="reports-section">
+      <h2 class="section-title">Reportes guardados</h2>
+      @if (cargando()) {
+        <p class="loading-msg">Cargando reportes...</p>
+      } @else if (listaFiltrada().length === 0 && backendDisponible()) {
+        <app-empty-state titulo="Sin reportes" descripcion="Registre un evento de red para comenzar." />
+      } @else if (listaFiltrada().length > 0) {
+        <div class="reports-table-wrap panel">
+          <table class="reports-table">
+            <thead>
+              <tr>
+                <th>Título</th>
+                <th>Tipo</th>
+                <th>Severidad</th>
+                <th>Estado</th>
+                <th>VLAN</th>
+                <th>Dispositivo</th>
+                <th>Fecha</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (r of listaFiltrada(); track r._id) {
+                <tr>
+                  <td>{{ r.title }}</td>
+                  <td><span class="tag">{{ typeLabels[r.type] }}</span></td>
+                  <td><span class="badge" [class]="claseSeveridad(r.severity)">{{ severityLabels[r.severity] }}</span></td>
+                  <td><span class="badge" [class]="claseEstado(r.status)">{{ statusLabels[r.status] }}</span></td>
+                  <td class="mono">{{ r.vlanId ?? '—' }}</td>
+                  <td class="mono">{{ r.deviceIp ?? '—' }}</td>
+                  <td class="mono">{{ r.createdAt | date: 'short' }}</td>
+                  <td class="row-actions">
+                    <button type="button" class="btn btn-outline btn-sm" (click)="verDetalle(r)">Ver</button>
+                    <button type="button" class="btn btn-outline btn-sm" (click)="abrirEditar(r)">Editar</button>
+                    <button type="button" class="btn btn-outline btn-sm" (click)="descargarPdf(r)">PDF</button>
+                    <button type="button" class="btn btn-danger btn-sm" (click)="eliminar(r)">Eliminar</button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </section>
+
+    <section class="mock-section">
+      <h2 class="section-title">Exportación mock (CSV / Excel / PDF)</h2>
+      <p class="section-desc">Funcionalidad existente del SOC — no requiere backend.</p>
+      <div class="report-grid">
+        @for (item of items; track item.tipo) {
+          <section class="panel report-card">
+            <h3>{{ item.titulo }}</h3>
+            <p>{{ item.desc }}</p>
+            <div class="report-btns">
+              <button type="button" class="btn btn-outline btn-sm" [disabled]="exportando()" (click)="exportar(item.tipo, 'csv')">CSV</button>
+              <button type="button" class="btn btn-outline btn-sm" [disabled]="exportando()" (click)="exportar(item.tipo, 'excel')">Excel</button>
+              <button type="button" class="btn btn-primary btn-sm" [disabled]="exportando()" (click)="exportar(item.tipo, 'pdf')">PDF</button>
+            </div>
+          </section>
+        }
+      </div>
+    </section>
+  </div>
+</app-page-shell>
+
+<app-modal
+  [abierto]="modalForm()"
+  [titulo]="editando() ? 'Editar reporte' : 'Nuevo reporte de evento'"
+  size="lg"
+  (cerrar)="cerrarModal()"
+>
+  <form [formGroup]="form" class="report-form" (ngSubmit)="guardar()">
+    <label>Título<input formControlName="title" /></label>
+    <label>Descripción<textarea formControlName="description" rows="3"></textarea></label>
+    <div class="form-row">
+      <label>Tipo
+        <select formControlName="type">
+          @for (t of types; track t) {
+            <option [value]="t">{{ typeLabels[t] }}</option>
+          }
+        </select>
+      </label>
+      <label>Severidad
+        <select formControlName="severity">
+          @for (s of severities; track s) {
+            <option [value]="s">{{ severityLabels[s] }}</option>
+          }
+        </select>
+      </label>
+      <label>Estado
+        <select formControlName="status">
+          @for (st of statuses; track st) {
+            <option [value]="st">{{ statusLabels[st] }}</option>
+          }
+        </select>
+      </label>
+    </div>
+    <div class="form-row">
+      <label>VLAN<input type="number" formControlName="vlanId" /></label>
+      <label>IP dispositivo<input formControlName="deviceIp" /></label>
+      <label>MAC dispositivo<input formControlName="deviceMac" /></label>
+      <label>IP atacante<input formControlName="attackerIp" /></label>
+    </div>
+    <label>Acción tomada<textarea formControlName="actionTaken" rows="2"></textarea></label>
+    <label>Logs (uno por línea)<textarea formControlName="logsText" rows="3"></textarea></label>
+    <label>Evidencia (uno por línea)<textarea formControlName="evidenceText" rows="3"></textarea></label>
+    <div class="modal-actions">
+      <button type="button" class="btn btn-outline" (click)="cerrarModal()">Cancelar</button>
+      <button type="submit" class="btn btn-primary" [disabled]="guardando()">
+        {{ guardando() ? 'Guardando...' : (editando() ? 'Actualizar' : 'Registrar') }}
+      </button>
+    </div>
+  </form>
+</app-modal>
+
+@if (seleccionado(); as r) {
+  @if (!modalForm()) {
+    <app-modal [abierto]="true" [titulo]="r.title" size="lg" (cerrar)="cerrarDetalle()">
+      <div class="detail-grid">
+        <div><span class="lbl">Tipo</span><strong>{{ typeLabels[r.type] }}</strong></div>
+        <div><span class="lbl">Severidad</span><strong>{{ severityLabels[r.severity] }}</strong></div>
+        <div><span class="lbl">Estado</span><strong>{{ statusLabels[r.status] }}</strong></div>
+        <div><span class="lbl">VLAN</span><strong class="mono">{{ r.vlanId ?? '—' }}</strong></div>
+        <div><span class="lbl">IP dispositivo</span><strong class="mono">{{ r.deviceIp ?? '—' }}</strong></div>
+        <div><span class="lbl">MAC</span><strong class="mono">{{ r.deviceMac ?? '—' }}</strong></div>
+        <div><span class="lbl">IP atacante</span><strong class="mono">{{ r.attackerIp ?? '—' }}</strong></div>
+        <div><span class="lbl">Registrado por</span><strong>{{ r.createdBy }}</strong></div>
+        <div><span class="lbl">Creado</span><strong>{{ r.createdAt | date: 'medium' }}</strong></div>
+      </div>
+      <p class="detail-block"><span class="lbl">Descripción</span>{{ r.description }}</p>
+      @if (r.actionTaken) {
+        <p class="detail-block"><span class="lbl">Acción tomada</span>{{ r.actionTaken }}</p>
+      }
+      @if (r.logs?.length) {
+        <div class="detail-block">
+          <span class="lbl">Logs</span>
+          <ul>@for (l of r.logs; track l) { <li class="mono">{{ l }}</li> }</ul>
+        </div>
+      }
+      @if (r.evidence?.length) {
+        <div class="detail-block">
+          <span class="lbl">Evidencia</span>
+          <ul>@for (e of r.evidence; track e) { <li>{{ e }}</li> }</ul>
+        </div>
+      }
+      <div class="modal-actions">
+        <button type="button" class="btn btn-outline" (click)="descargarPdf(r)">Descargar PDF</button>
+        <button type="button" class="btn btn-primary" (click)="abrirEditar(r); cerrarDetalle()">Editar</button>
+      </div>
+    </app-modal>
+  }
+}

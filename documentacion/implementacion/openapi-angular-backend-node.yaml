@@ -1,0 +1,498 @@
+openapi: 3.1.0
+info:
+  title: NetGuard SOC API
+  description: |
+    Contrato REST **futuro** entre frontend Angular y backend Node.js.
+    No implica que el servidor esté implementado en el repositorio actual.
+  version: 1.0.0
+  contact:
+    name: Equipo NetGuard SOC
+
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Desarrollo local (futuro)
+  - url: https://api-staging.example.com/api/v1
+    description: Staging (futuro)
+
+tags:
+  - name: Auth
+  - name: Users
+  - name: NetworkMonitoring
+  - name: VLANManagement
+  - name: SecurityPolicies
+  - name: ThreatDetection
+  - name: Quarantine
+  - name: AuditLogs
+  - name: IncidentResponse
+  - name: SOC_AI_Assistant
+
+paths:
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Iniciar sesión
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Tokens y usuario
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /auth/refresh:
+    post:
+      tags: [Auth]
+      summary: Renovar access token
+      responses:
+        '200':
+          description: Nuevo access token
+
+  /users/me:
+    get:
+      tags: [Users]
+      security: [{ bearerAuth: [] }]
+      summary: Perfil del usuario autenticado
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /devices:
+    get:
+      tags: [NetworkMonitoring]
+      security: [{ bearerAuth: [] }]
+      summary: Listar dispositivos
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [online, offline, degraded, quarantine]
+        - name: vlanId
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Device'
+
+  /topology:
+    get:
+      tags: [NetworkMonitoring]
+      security: [{ bearerAuth: [] }]
+      summary: Topología de red
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Topology'
+
+  /vlans:
+    get:
+      tags: [VLANManagement]
+      security: [{ bearerAuth: [] }]
+      summary: Listar VLANs
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Vlan'
+    post:
+      tags: [VLANManagement]
+      security: [{ bearerAuth: [] }]
+      summary: Crear VLAN (futuro)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VlanCreate'
+      responses:
+        '201':
+          description: VLAN creada
+
+  /policies:
+    get:
+      tags: [SecurityPolicies]
+      security: [{ bearerAuth: [] }]
+      summary: Listar políticas
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Policy'
+    post:
+      tags: [SecurityPolicies]
+      security: [{ bearerAuth: [] }]
+      summary: Crear política
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PolicyCreate'
+      responses:
+        '201':
+          description: Política creada
+
+  /alerts:
+    get:
+      tags: [ThreatDetection]
+      security: [{ bearerAuth: [] }]
+      summary: Listar alertas
+      parameters:
+        - name: severity
+          in: query
+          schema:
+            type: string
+            enum: [critical, high, medium, low]
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [open, acknowledged, closed]
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Alert'
+
+  /alerts/{id}/acknowledge:
+    patch:
+      tags: [ThreatDetection]
+      security: [{ bearerAuth: [] }]
+      summary: Reconocer alerta
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Alerta actualizada
+
+  /quarantine/isolate:
+    post:
+      tags: [Quarantine]
+      security: [{ bearerAuth: [] }]
+      summary: Aislar host en VLAN cuarentena
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IsolateRequest'
+      responses:
+        '200':
+          description: Host aislado
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /quarantine/release:
+    post:
+      tags: [Quarantine]
+      security: [{ bearerAuth: [] }]
+      summary: Liberar host de cuarentena
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReleaseRequest'
+      responses:
+        '200':
+          description: Host liberado
+
+  /quarantine/hosts:
+    get:
+      tags: [Quarantine]
+      security: [{ bearerAuth: [] }]
+      summary: Hosts en cuarentena
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/QuarantineHost'
+
+  /audit:
+    get:
+      tags: [AuditLogs]
+      security: [{ bearerAuth: [] }]
+      summary: Consultar auditoría
+      parameters:
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AuditEntry'
+
+  /incidents:
+    post:
+      tags: [IncidentResponse]
+      security: [{ bearerAuth: [] }]
+      summary: Registrar incidente
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IncidentCreate'
+      responses:
+        '201':
+          description: Incidente creado
+
+  /simulations:
+    post:
+      tags: [ThreatDetection]
+      security: [{ bearerAuth: [] }]
+      summary: Ejecutar simulación de ataque (lab)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SimulationRequest'
+      responses:
+        '202':
+          description: Simulación iniciada
+
+  /soc-ai/chat:
+    post:
+      tags: [SOC_AI_Assistant]
+      security: [{ bearerAuth: [] }]
+      summary: Consulta al asistente IA (futuro)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatResponse'
+
+  /health:
+    get:
+      summary: Health check
+      responses:
+        '200':
+          description: Servicio operativo
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    Unauthorized:
+      description: No autenticado
+    Forbidden:
+      description: Sin permisos
+
+  schemas:
+    LoginRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username: { type: string }
+        password: { type: string, format: password }
+
+    LoginResponse:
+      type: object
+      properties:
+        accessToken: { type: string }
+        refreshToken: { type: string }
+        user:
+          $ref: '#/components/schemas/User'
+
+    User:
+      type: object
+      properties:
+        id: { type: string }
+        username: { type: string }
+        displayName: { type: string }
+        role:
+          type: string
+          enum: [admin, operador, analista]
+
+    Device:
+      type: object
+      properties:
+        id: { type: string }
+        hostname: { type: string }
+        ip: { type: string }
+        mac: { type: string }
+        vlanId: { type: integer }
+        status:
+          type: string
+          enum: [online, offline, degraded, quarantine]
+
+    Topology:
+      type: object
+      properties:
+        nodes:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: string }
+              label: { type: string }
+              type: { type: string }
+        edges:
+          type: array
+          items:
+            type: object
+            properties:
+              source: { type: string }
+              target: { type: string }
+
+    Vlan:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        subnet: { type: string }
+        status:
+          type: string
+          enum: [active, degraded, maintenance, quarantine]
+
+    VlanCreate:
+      type: object
+      required: [id, name, subnet]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        subnet: { type: string }
+
+    Policy:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        enabled: { type: boolean }
+        severity:
+          type: string
+          enum: [critical, high, medium, low]
+        autoQuarantine: { type: boolean }
+
+    PolicyCreate:
+      type: object
+      required: [name, rules]
+      properties:
+        name: { type: string }
+        rules: { type: array, items: { type: object } }
+        severity: { type: string }
+        autoQuarantine: { type: boolean }
+
+    Alert:
+      type: object
+      properties:
+        id: { type: string }
+        title: { type: string }
+        severity: { type: string }
+        status: { type: string }
+        deviceId: { type: string }
+        policyId: { type: string }
+        createdAt: { type: string, format: date-time }
+
+    IsolateRequest:
+      type: object
+      required: [deviceId, reason]
+      properties:
+        deviceId: { type: string }
+        reason: { type: string }
+
+    ReleaseRequest:
+      type: object
+      required: [deviceId]
+      properties:
+        deviceId: { type: string }
+
+    QuarantineHost:
+      type: object
+      properties:
+        deviceId: { type: string }
+        isolatedAt: { type: string, format: date-time }
+        reason: { type: string }
+
+    AuditEntry:
+      type: object
+      properties:
+        id: { type: string }
+        action: { type: string }
+        actor: { type: string }
+        resource: { type: string }
+        timestamp: { type: string, format: date-time }
+
+    IncidentCreate:
+      type: object
+      required: [alertIds, severity]
+      properties:
+        alertIds:
+          type: array
+          items: { type: string }
+        severity: { type: string }
+        notes: { type: string }
+
+    SimulationRequest:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [port_scan, brute_force, lateral_movement]
+        targetDeviceId: { type: string }
+
+    ChatRequest:
+      type: object
+      properties:
+        message: { type: string }
+        context:
+          type: object
+          properties:
+            alertIds: { type: array, items: { type: string } }
+
+    ChatResponse:
+      type: object
+      properties:
+        reply: { type: string }
+        disclaimers: { type: array, items: { type: string } }

@@ -15,7 +15,27 @@ jobs:
         with:
           node-version: '22'
           cache: 'npm'
-      - run: npm ci
-      - run: npm run lint:check
-      - run: npm run test:ci
-      - run: npm run build
+          cache-dependency-path: frontend/package-lock.json
+      - name: Frontend — install
+        working-directory: frontend
+        run: npm ci
+      - name: Frontend — lint
+        working-directory: frontend
+        run: npm run lint:check
+      - name: Frontend — test
+        working-directory: frontend
+        run: npm run test:ci
+      - name: Frontend — build
+        working-directory: frontend
+        run: npm run build
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+      - name: Backend — install
+        working-directory: backend
+        run: npm ci
+      - name: Backend — typecheck
+        working-directory: backend
+        run: npm run lint
