@@ -18,7 +18,7 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
       - name: Frontend — install
         working-directory: frontend
-        run: npm ci
+        run: npm install
       - name: Frontend — lint
         working-directory: frontend
         run: npm run lint:check
@@ -35,7 +35,7 @@ jobs:
           cache-dependency-path: backend/package-lock.json
       - name: Backend — install
         working-directory: backend
-        run: npm ci
+        run: npm install
       - name: Backend — typecheck
         working-directory: backend
         run: npm run lint
