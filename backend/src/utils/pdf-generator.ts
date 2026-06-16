@@ -23,7 +23,7 @@ export function generateReportPdf(report: IReport): Promise<Buffer> {
     doc.on('end', () => resolve(Buffer.concat(chunks)));
     doc.on('error', reject);
 
-    doc.fontSize(18).fillColor('#0ea5e9').text('My Monitoreo — Reporte de evento', { align: 'center' });
+    doc.fontSize(18).fillColor('#0ea5e9').text('NetWatch Pro — Reporte de evento', { align: 'center' });
     doc.moveDown(0.5);
     doc.fontSize(14).fillColor('#111827').text(report.title, { align: 'center' });
     doc.moveDown(1.2);
@@ -31,12 +31,22 @@ export function generateReportPdf(report: IReport): Promise<Buffer> {
     addSection(doc, 'Tipo de evento', report.type);
     addSection(doc, 'Severidad', report.severity);
     addSection(doc, 'Estado', report.status);
+    if (report.isoStandard) addSection(doc, 'Estándar ISO', report.isoStandard);
+    if (report.dimension) addSection(doc, 'Dimensión (matriz de operacionalización)', report.dimension);
+    if (report.controlIso) addSection(doc, 'Control ISO 27001', report.controlIso);
     addSection(doc, 'Fecha de creación', formatDate(report.createdAt));
     addSection(doc, 'Última actualización', formatDate(report.updatedAt));
     addSection(doc, 'VLAN afectada', report.vlanId !== undefined ? String(report.vlanId) : '—');
     addSection(doc, 'Dispositivo (IP)', report.deviceIp ?? '—');
     addSection(doc, 'Dispositivo (MAC)', report.deviceMac ?? '—');
     addSection(doc, 'IP atacante', report.attackerIp ?? '—');
+    if (report.activoAfectado) addSection(doc, 'Activo afectado', report.activoAfectado);
+    if (report.amenaza) addSection(doc, 'Amenaza', report.amenaza);
+    if (report.vulnerabilidad) addSection(doc, 'Vulnerabilidad', report.vulnerabilidad);
+    if (report.riesgoNivel) addSection(doc, 'Nivel de riesgo', report.riesgoNivel);
+    if (report.impacto !== undefined) addSection(doc, 'Impacto (1-5)', String(report.impacto));
+    if (report.probabilidad !== undefined) addSection(doc, 'Probabilidad (1-5)', String(report.probabilidad));
+    if (report.tratamiento) addSection(doc, 'Tratamiento de riesgo', report.tratamiento);
     addSection(doc, 'Descripción', report.description);
     addSection(doc, 'Acción tomada', report.actionTaken ?? '—');
     addSection(doc, 'Registrado por', report.createdBy);
@@ -60,6 +70,15 @@ export function generateReportPdf(report: IReport): Promise<Buffer> {
       });
     } else {
       doc.fontSize(10).text('—');
+    }
+
+    if (report.evidenciaIso?.length) {
+      doc.moveDown(0.8);
+      doc.fontSize(11).fillColor('#111827').text('Evidencia ISO / matriz', { underline: true });
+      doc.moveDown(0.3);
+      report.evidenciaIso.forEach((item, i) => {
+        doc.fontSize(9).fillColor('#4b5563').text(`${i + 1}. ${item}`);
+      });
     }
 
     doc.end();

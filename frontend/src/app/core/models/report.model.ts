@@ -11,11 +11,33 @@ export const REPORT_TYPES = [
 export const REPORT_SEVERITIES = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'] as const;
 export const REPORT_STATUSES = ['OPEN', 'IN_PROGRESS', 'RESOLVED', 'ARCHIVED'] as const;
 
+export const ISO_STANDARDS = ['ISO_27001', 'ISO_25000'] as const;
+export const RIESGO_NIVELES = ['bajo', 'medio', 'alto', 'critico'] as const;
+export const TRATAMIENTOS_RIESGO = ['aceptar', 'mitigar', 'transferir', 'evitar'] as const;
+
 export type ReportType = (typeof REPORT_TYPES)[number];
 export type ReportSeverity = (typeof REPORT_SEVERITIES)[number];
 export type ReportStatus = (typeof REPORT_STATUSES)[number];
+export type IsoStandard = (typeof ISO_STANDARDS)[number];
+export type RiesgoNivel = (typeof RIESGO_NIVELES)[number];
+export type TratamientoRiesgo = (typeof TRATAMIENTOS_RIESGO)[number];
 
-export interface NetworkReport {
+/** Campos opcionales ISO / matriz de operacionalización */
+export interface CamposIsoReporte {
+  isoStandard?: IsoStandard;
+  dimension?: string;
+  controlIso?: string;
+  riesgoNivel?: RiesgoNivel;
+  impacto?: number;
+  probabilidad?: number;
+  activoAfectado?: string;
+  amenaza?: string;
+  vulnerabilidad?: string;
+  tratamiento?: TratamientoRiesgo;
+  evidenciaIso?: string[];
+}
+
+export interface NetworkReport extends CamposIsoReporte {
   _id: string;
   title: string;
   description: string;
@@ -48,6 +70,17 @@ export interface CreateReportPayload {
   createdBy: string;
   evidence?: string[];
   logs?: string[];
+  isoStandard?: IsoStandard;
+  dimension?: string;
+  controlIso?: string;
+  riesgoNivel?: RiesgoNivel;
+  impacto?: number;
+  probabilidad?: number;
+  activoAfectado?: string;
+  amenaza?: string;
+  vulnerabilidad?: string;
+  tratamiento?: TratamientoRiesgo;
+  evidenciaIso?: string[];
 }
 
 export type UpdateReportPayload = Partial<CreateReportPayload>;
@@ -84,4 +117,23 @@ export const REPORT_STATUS_LABELS: Record<ReportStatus, string> = {
   IN_PROGRESS: 'En progreso',
   RESOLVED: 'Resuelto',
   ARCHIVED: 'Archivado'
+};
+
+export const ISO_STANDARD_LABELS: Record<IsoStandard, string> = {
+  ISO_27001: 'ISO/IEC 27001',
+  ISO_25000: 'ISO/IEC 25000'
+};
+
+export const RIESGO_NIVEL_LABELS: Record<RiesgoNivel, string> = {
+  bajo: 'Bajo',
+  medio: 'Medio',
+  alto: 'Alto',
+  critico: 'Crítico'
+};
+
+export const TRATAMIENTO_RIESGO_LABELS: Record<TratamientoRiesgo, string> = {
+  aceptar: 'Aceptar',
+  mitigar: 'Mitigar',
+  transferir: 'Transferir',
+  evitar: 'Evitar'
 };

@@ -3,7 +3,7 @@
     <header class="page-header">
       <div>
         <h1 class="page-title">VLANs activas</h1>
-        <p class="page-subtitle">Segmentación de red · políticas de aislamiento por capa</p>
+        <p class="page-subtitle">Segmentación institucional · áreas académicas · políticas inter-VLAN</p>
       </div>
       <a routerLink="/vlan-cuarentena" class="btn btn-danger btn-sm">Ver cuarentena</a>
     </header>
@@ -16,11 +16,13 @@
             <app-status-badge [estado]="estadoVlan(v.estado)" />
           </div>
           <h3>{{ v.nombre }}</h3>
+          <span class="area-badge">{{ etiquetaArea(v.areaInstitucional) }}</span>
           <p class="rango mono">{{ v.rango }}</p>
           <div class="vlan-stats">
             <div><span class="lbl">Gateway</span><span class="mono">{{ v.gateway }}</span></div>
             <div><span class="lbl">Hosts</span><span>{{ v.dispositivos }}</span></div>
             <div><span class="lbl">Tráfico</span><span [style.color]="v.color">{{ v.traficoMbps | number:'1.0-0' }} Mbps</span></div>
+            <div><span class="lbl">Bloqueos 24h</span><span>{{ v.bloqueosInterVlan24h ?? 0 }}</span></div>
           </div>
           <div class="traffic-bar-bg">
             <div class="traffic-bar-fill" [style.width.%]="porcentaje(v.traficoMbps, v.maxMbps)" [style.background]="v.color"></div>
@@ -29,5 +31,27 @@
         </article>
       }
     </div>
+
+    <section class="panel traffic-matrix">
+      <div class="panel-header"><span class="panel-title">Políticas de tráfico entre segmentos (ISO A.8.22)</span></div>
+      <div class="panel-body">
+        <table class="data-table">
+          <thead>
+            <tr><th>Origen</th><th>Destino</th><th>Estado</th><th>Protocolo</th><th>Descripción</th></tr>
+          </thead>
+          <tbody>
+            @for (p of iso.politicasTraficoVlan; track p.origen + p.destino) {
+              <tr>
+                <td>{{ etiquetaArea(p.origen) }}</td>
+                <td>{{ etiquetaArea(p.destino) }}</td>
+                <td><span class="traffic-badge" [class.deny]="!p.permitido">{{ p.permitido ? 'PERMIT' : 'DENY' }}</span></td>
+                <td class="mono">{{ p.protocolo ?? '—' }}</td>
+                <td>{{ p.descripcion }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
   </div>
 </app-page-shell>

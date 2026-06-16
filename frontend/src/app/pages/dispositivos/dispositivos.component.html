@@ -7,6 +7,13 @@
       </div>
     </header>
 
+    <div class="resilience-bar panel">
+      <span>Índice resiliencia: <strong>{{ iso.resiliencia().indiceResiliencia }}%</strong></span>
+      <span>Redundantes: <strong>{{ iso.resiliencia().equiposRedundantes }}/{{ iso.resiliencia().equiposTotal }}</strong></span>
+      <span>SPOF: <strong>{{ iso.resiliencia().puntosUnicosFallo.length }}</strong></span>
+      <span>Vulnerabilidades: <strong>{{ iso.vulnerabilidades().length }}</strong></span>
+    </div>
+
     <div class="toolbar">
       <input
         type="search"
@@ -48,6 +55,7 @@
                 <th>Uptime</th>
                 <th>Operativo</th>
                 <th>Seguridad</th>
+                <th>Vulns.</th>
                 <th>Acciones</th>
               </tr>
             </thead>
@@ -66,6 +74,7 @@
                   <td class="mono">{{ d.uptime }}%</td>
                   <td><app-status-badge [estado]="d.estado" /></td>
                   <td><app-status-badge [estado]="d.seguridad" /></td>
+                  <td class="mono">{{ vulnsParaDispositivo(d.id) || '—' }}</td>
                   <td class="actions">
                     <button type="button" class="btn btn-outline btn-sm" (click)="seleccionado.set(d)">Ver</button>
                     @if (d.seguridad === 'intruso' || d.seguridad === 'alerta') {

@@ -1,3 +1,20 @@
+.iso-kpi-grid { margin-top: 12px; }
+.iso-panel { margin-bottom: 20px; }
+.iso-indicators {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+.iso-indicator {
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-surface);
+}
+.iso-indicator .lbl { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px; }
+.iso-indicator strong { font-size: 1.25rem; }
+.iso-indicator small { display: block; margin-top: 4px; color: var(--text-muted); font-size: 0.7rem; }
+
 .header-actions {
   display: flex;
   gap: 10px;

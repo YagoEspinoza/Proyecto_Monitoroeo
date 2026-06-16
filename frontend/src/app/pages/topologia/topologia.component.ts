@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MockNetworkService } from '../../core/services/mock-network.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { EstadoSeguridad, EnlaceTopologia, NodoTopologia } from '../../core/models/network.models';
+import { IsoComplianceService } from '../../core/services/iso-compliance.service';
 import { PageShellComponent } from '../../shared/components/page-shell/page-shell';
 import { colorEstadoSeguridad } from '../../shared/utils/network-display.utils';
 
@@ -16,6 +17,7 @@ import { colorEstadoSeguridad } from '../../shared/utils/network-display.utils';
 export class TopologiaComponent {
   readonly mock = inject(MockNetworkService);
   readonly notif = inject(NotificationService);
+  readonly iso = inject(IsoComplianceService);
 
   readonly zoom = signal(1);
   readonly nodoSeleccionado = signal<NodoTopologia | null>(null);

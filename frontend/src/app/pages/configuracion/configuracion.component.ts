@@ -6,6 +6,7 @@ import { ThemeService } from '../../core/services/theme.service';
 import { UxPreferencesService } from '../../core/services/ux-preferences.service';
 import { SensibilidadDeteccion } from '../../core/models/config.models';
 import { TemaId } from '../../core/models/ux.models';
+import { IsoComplianceService } from '../../core/services/iso-compliance.service';
 import { PageShellComponent } from '../../shared/components/page-shell/page-shell';
 
 type SeccionConfig =
@@ -14,7 +15,8 @@ type SeccionConfig =
   | 'alertas'
   | 'simulacion'
   | 'sensibilidad'
-  | 'tema';
+  | 'tema'
+  | 'calidad-iso';
 
 @Component({
   selector: 'app-configuracion',
@@ -28,6 +30,7 @@ export class ConfiguracionComponent {
   readonly configSvc = inject(SystemConfigService);
   readonly themeSvc = inject(ThemeService);
   readonly uxSvc = inject(UxPreferencesService);
+  readonly iso = inject(IsoComplianceService);
 
   readonly seccionActiva = signal<SeccionConfig>('red');
 
@@ -37,7 +40,8 @@ export class ConfiguracionComponent {
     { id: 'alertas', label: 'Alertas', icon: '⚠' },
     { id: 'simulacion', label: 'Simulación', icon: '⟳' },
     { id: 'sensibilidad', label: 'Detección IDS', icon: '⊕' },
-    { id: 'tema', label: 'Apariencia', icon: '◐' }
+    { id: 'tema', label: 'Apariencia', icon: '◐' },
+    { id: 'calidad-iso', label: 'Calidad ISO 25000', icon: '◆' }
   ];
 
   puedeEditar(): boolean {

@@ -51,6 +51,66 @@
         accent="#38bdf8" />
     </div>
 
+    <div class="kpi-grid iso-kpi-grid">
+      <app-kpi-card
+        etiqueta="ISO 27001"
+        [valor]="iso.cumplimientoIso27001().porcentajeGeneral"
+        sufijo="%"
+        subtitulo="Cumplimiento SGSI"
+        icono="◆"
+        accent="#8b5cf6" />
+      <app-kpi-card
+        etiqueta="ISO 25000"
+        [valor]="iso.cumplimientoIso25000().porcentajeGeneral"
+        sufijo="%"
+        subtitulo="Calidad del software"
+        icono="◇"
+        accent="#06b6d4" />
+      <app-kpi-card
+        etiqueta="Disponibilidad red"
+        [valor]="mock.metricas().disponibilidadRedPct ?? 0"
+        sufijo="%"
+        [subtitulo]="'GW activo: ' + (mock.metricas().gatewayActivo ?? '—')"
+        icono="⟳"
+        accent="#10b981" />
+      <app-kpi-card
+        etiqueta="Confianza institucional"
+        [valor]="iso.confianzaInstitucional().nivel"
+        sufijo="%"
+        subtitulo="Postura de ciberseguridad"
+        icono="★"
+        accent="#f59e0b" />
+    </div>
+
+    <section class="panel iso-panel">
+      <div class="panel-header">
+        <span class="panel-title">Matriz de operacionalización — indicadores clave</span>
+        <a routerLink="/reportes" class="btn btn-outline btn-sm">Ver reportes ISO</a>
+      </div>
+      <div class="panel-body iso-indicators">
+        <div class="iso-indicator">
+          <span class="lbl">Gateway respaldo (HSRP)</span>
+          <strong class="mono">{{ mock.metricas().gatewayRespaldo ?? '—' }}</strong>
+          <small>RTO promedio: {{ mock.metricas().tiempoRecuperacionPromedioSeg ?? 0 }}s</small>
+        </div>
+        <div class="iso-indicator">
+          <span class="lbl">Resiliencia infraestructura</span>
+          <strong>{{ iso.resiliencia().indiceResiliencia }}%</strong>
+          <small>{{ iso.resiliencia().puntosUnicosFallo.length }} SPOF · {{ iso.resiliencia().equiposRedundantes }} redundantes</small>
+        </div>
+        <div class="iso-indicator">
+          <span class="lbl">Riesgos / vulnerabilidades</span>
+          <strong>{{ iso.riesgos().length }} / {{ iso.vulnerabilidades().length }}</strong>
+          <small>{{ mock.metricas().riesgosCriticos ?? 0 }} críticos · {{ mock.metricas().vulnerabilidadesAbiertas ?? 0 }} abiertas</small>
+        </div>
+        <div class="iso-indicator">
+          <span class="lbl">Software SOC (48h)</span>
+          <strong>{{ iso.evaluacionCalidadSoftware().disponibilidadSoftware }}%</strong>
+          <small>Alerta {{ iso.evaluacionCalidadSoftware().tiempoRespuestaAlertaMs / 1000 | number:'1.1-1' }}s · CPU {{ iso.evaluacionCalidadSoftware().cpuUso }}%</small>
+        </div>
+      </div>
+    </section>
+
     @if (layout.modoEdicion()) {
       <p class="edit-hint mono">Modo edición: usa ↑↓ en cada panel para reordenar widgets</p>
     }

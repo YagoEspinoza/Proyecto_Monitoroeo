@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
@@ -13,6 +13,7 @@ import { StatusBadgeComponent } from '../../shared/components/status-badge/statu
 import { ModalComponent } from '../../shared/components/modal/modal';
 import { PageShellComponent } from '../../shared/components/page-shell/page-shell';
 import { ChartWidgetComponent } from '../../shared/components/chart-widget/chart-widget';
+import { IsoComplianceService } from '../../core/services/iso-compliance.service';
 import {
   etiquetaNivelAlerta,
   iconoTipoDispositivo,
@@ -35,15 +36,20 @@ import {
   templateUrl: './vision-general.component.html',
   styleUrl: './vision-general.css'
 })
-export class VisionGeneralComponent {
+export class VisionGeneralComponent implements OnInit {
   readonly mock = inject(MockNetworkService);
   readonly notif = inject(NotificationService);
   readonly auth = inject(AuthService);
   readonly policies = inject(SecurityPolicyService);
   readonly config = inject(SystemConfigService);
   readonly layout = inject(DashboardLayoutService);
+  readonly iso = inject(IsoComplianceService);
 
   readonly modalDispositivo = signal<DispositivoRed | null>(null);
+
+  ngOnInit(): void {
+    this.iso.cargarResumenBackend();
+  }
 
   widgetVisible(id: WidgetId): boolean {
     return this.layout.widgets().find(w => w.id === id)?.visible ?? true;

@@ -61,6 +61,29 @@
         }
       </div>
     }
+
+    <section class="panel iso-controls-panel">
+      <div class="panel-header">
+        <span class="panel-title">Checklist controles ISO/IEC 27001 — Dimensión 6</span>
+        <span class="chip mono">{{ iso.cumplimientoIso27001().porcentajeGeneral }}% cumplimiento</span>
+      </div>
+      <div class="panel-body">
+        <table class="data-table">
+          <thead><tr><th>Control</th><th>Nombre</th><th>Dominio</th><th>Estado</th><th>%</th></tr></thead>
+          <tbody>
+            @for (c of iso.controlesIso27001(); track c.id) {
+              <tr>
+                <td class="mono">{{ c.codigo }}</td>
+                <td>{{ c.nombre }}</td>
+                <td>{{ c.dominio }}</td>
+                <td>{{ c.aplicado ? '✓ Aplicado' : '○ Pendiente' }}</td>
+                <td class="mono">{{ c.porcentajeCumplimiento }}%</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
   </div>
 </app-page-shell>
 

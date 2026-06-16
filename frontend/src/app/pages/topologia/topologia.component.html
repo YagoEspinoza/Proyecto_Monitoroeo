@@ -12,6 +12,25 @@
       </div>
     </header>
 
+    <div class="ha-bar panel">
+      <div class="ha-item">
+        <span class="lbl">Gateway activo (HSRP)</span>
+        <strong class="mono">{{ iso.gatewayActivo()?.nombre }} — {{ iso.gatewayActivo()?.ip }}</strong>
+      </div>
+      <div class="ha-item">
+        <span class="lbl">Gateway respaldo</span>
+        <strong class="mono">{{ iso.gatewayRespaldo()?.nombre }} — {{ iso.gatewayRespaldo()?.ip }}</strong>
+      </div>
+      <div class="ha-item">
+        <span class="lbl">Resiliencia</span>
+        <strong>{{ iso.resiliencia().indiceResiliencia }}%</strong>
+      </div>
+      <div class="ha-item">
+        <span class="lbl">RTO promedio</span>
+        <strong>{{ iso.kpiDisponibilidadRed().tiempoRecuperacionPromedioSeg }}s</strong>
+      </div>
+    </div>
+
     <div class="topology-layout">
       <section class="panel map-panel">
         <div class="panel-header">

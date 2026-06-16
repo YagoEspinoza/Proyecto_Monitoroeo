@@ -171,6 +171,41 @@
               </div>
             </div>
           }
+          @case ('calidad-iso') {
+            <div class="panel-header"><h3>Calidad técnica ISO/IEC 25000 (SQuaRE)</h3></div>
+            <div class="panel-body">
+              <p class="hint">Dimensión 10 — Mantenibilidad y portabilidad del software NetWatch Pro</p>
+              <h4>Módulos del sistema</h4>
+              <ul class="mod-list">
+                @for (m of iso.modulosSistema; track m.clave) {
+                  <li><span class="mono">{{ m.clave }}</span> — {{ m.nombre }}</li>
+                }
+              </ul>
+              <h4>Checklist de instalación</h4>
+              <ul class="mod-list">
+                <li>✓ Node.js 18+ y MongoDB para backend de reportes</li>
+                <li>✓ Angular 21 frontend compilado</li>
+                <li>✓ Compatibilidad SNMP v2c/v3 (Cisco, MikroTik)</li>
+                <li>✓ WebSocket para telemetría en vivo</li>
+                <li>✓ Documentación técnica en /documentacion</li>
+              </ul>
+              <h4>Métricas SQuaRE</h4>
+              <table class="data-table">
+                <thead><tr><th>Métrica</th><th>Valor</th><th>Umbral</th><th>Estado</th></tr></thead>
+                <tbody>
+                  @for (m of iso.metricasIso25000(); track m.clave) {
+                    <tr>
+                      <td>{{ m.nombre }}</td>
+                      <td class="mono">{{ m.valor }}{{ m.unidad }}</td>
+                      <td class="mono">{{ m.umbral }}{{ m.unidad === 's' ? 's' : '%' }}</td>
+                      <td>{{ m.cumple ? '✓ Cumple' : '✗ Pendiente' }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+              <p class="hint">Dependencias críticas: Express, Mongoose, PDFKit, Angular, Chart.js</p>
+            </div>
+          }
         }
       </div>
     </div>

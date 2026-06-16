@@ -21,6 +21,28 @@ export class ReportService {
       .pipe(catchError(err => throwError(() => this.mapError(err))));
   }
 
+  getComplianceSummary(): Observable<{
+    general: { porcentajeCumplimiento: number; totalReportes: number };
+    iso27001: { porcentajeCumplimiento: number; controlesAplicados: number; controlesPendientes: number };
+    iso25000: { porcentajeCumplimiento: number; dimensionesCubiertas: string[] };
+  }> {
+    return this.http
+      .get<{
+        general: { porcentajeCumplimiento: number; totalReportes: number };
+        iso27001: { porcentajeCumplimiento: number; controlesAplicados: number; controlesPendientes: number };
+        iso25000: { porcentajeCumplimiento: number; dimensionesCubiertas: string[] };
+      }>(`${this.baseUrl}/compliance-summary`)
+      .pipe(catchError(err => throwError(() => this.mapError(err))));
+  }
+
+  getIso27001Summary(): Observable<unknown> {
+    return this.http.get(`${this.baseUrl}/iso27001-summary`).pipe(catchError(err => throwError(() => this.mapError(err))));
+  }
+
+  getIso25000Summary(): Observable<unknown> {
+    return this.http.get(`${this.baseUrl}/iso25000-summary`).pipe(catchError(err => throwError(() => this.mapError(err))));
+  }
+
   getReportById(id: string): Observable<NetworkReport> {
     return this.http
       .get<NetworkReport>(`${this.baseUrl}/${id}`)

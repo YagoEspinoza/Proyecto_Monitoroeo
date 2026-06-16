@@ -5,7 +5,9 @@ import { AppError } from '../middlewares/error.middleware';
 import {
   ReportSeverity,
   ReportStatus,
-  ReportType
+  ReportType,
+  RiesgoNivel,
+  IsoStandard
 } from '../models/report.model';
 
 function paramId(req: Request): string {
@@ -31,7 +33,11 @@ export async function listReports(req: Request, res: Response, next: NextFunctio
       severity: req.query.severity as ReportSeverity | undefined,
       status: req.query.status as ReportStatus | undefined,
       vlanId: parseVlanId(req.query.vlanId),
-      deviceIp: req.query.deviceIp as string | undefined
+      deviceIp: req.query.deviceIp as string | undefined,
+      isoStandard: req.query.isoStandard as IsoStandard | undefined,
+      controlIso: req.query.controlIso as string | undefined,
+      riesgoNivel: req.query.riesgoNivel as RiesgoNivel | undefined,
+      dimension: req.query.dimension as string | undefined
     };
     const reports = await reportService.listReports(filters);
     res.json(reports);
@@ -84,6 +90,33 @@ export async function downloadReportPdf(req: Request, res: Response, next: NextF
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
     res.send(pdf);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function complianceSummary(_req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const summary = await reportService.getComplianceSummary();
+    res.json(summary);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function iso27001Summary(_req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const summary = await reportService.getIso27001Summary();
+    res.json(summary);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function iso25000Summary(_req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const summary = await reportService.getIso25000Summary();
+    res.json(summary);
   } catch (error) {
     next(error);
   }

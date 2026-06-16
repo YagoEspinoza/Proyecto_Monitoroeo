@@ -8,6 +8,7 @@ import { StatusBadgeComponent } from '../../shared/components/status-badge/statu
 import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state';
 import { ModalComponent } from '../../shared/components/modal/modal';
 import { PageShellComponent } from '../../shared/components/page-shell/page-shell';
+import { IsoComplianceService } from '../../core/services/iso-compliance.service';
 import { iconoTipoDispositivo } from '../../shared/utils/network-display.utils';
 
 @Component({
@@ -25,6 +26,7 @@ import { iconoTipoDispositivo } from '../../shared/utils/network-display.utils';
 })
 export class DispositivosComponent {
   readonly mock = inject(MockNetworkService);
+  readonly iso = inject(IsoComplianceService);
   readonly notif = inject(NotificationService);
   readonly auth = inject(AuthService);
 
@@ -68,5 +70,9 @@ export class DispositivosComponent {
     this.mock.liberarDispositivo(d.id);
     this.seleccionado.set(null);
     this.notif.success('Host liberado', `${d.nombre} restaurado a VLAN 30`);
+  }
+
+  vulnsParaDispositivo(id: string): number {
+    return this.iso.vulnerabilidades().filter(v => v.dispositivoId === id).length;
   }
 }

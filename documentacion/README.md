@@ -45,6 +45,10 @@ Sistema de **monitoreo de red, segmentación VLAN, detección de intrusos y oper
 | [avances/](./avances/) | Bitácora de progreso por fase |
 | [implementacion/](./implementacion/) | OpenAPI, WebSockets, integraciones e releases |
 | [entregables/](./entregables/) | Entregables académicos e informe final |
+| [procesos/](./procesos/) | Clasificación de procesos del sistema SOC |
+| [matriz-operacionalizacion/](./matriz-operacionalizacion/) | **Mapeo tesis:** variables, dimensiones 1–15 y archivos del código |
+| [gobierno_ia/](./gobierno_ia/) | **Gobierno IA:** trazabilidad Bolts, AI-DLC, BPMN, PMV y control de versiones |
+| [control_versiones/](./control_versiones/) | **Matriz AI-DLC:** evaluación por Bolt (5 secciones) y plantilla reutilizable |
 
 ---
 

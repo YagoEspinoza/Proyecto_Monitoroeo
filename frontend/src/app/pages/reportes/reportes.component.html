@@ -3,7 +3,7 @@
     <header class="page-header">
       <div>
         <h1 class="page-title">Reportes de eventos de red</h1>
-        <p class="page-subtitle">Registro, consulta y exportación PDF vía MongoDB</p>
+        <p class="page-subtitle">Registro, consulta, cumplimiento ISO y exportación PDF vía MongoDB</p>
       </div>
       <div class="header-actions">
         <button type="button" class="btn btn-primary btn-sm" (click)="abrirCrear()" [disabled]="!backendDisponible()">
@@ -22,6 +22,49 @@
         <button type="button" class="btn btn-outline btn-sm" (click)="cargarReportes()">Reintentar conexión</button>
       </div>
     }
+
+    <section class="panel iso-compliance-panel">
+      <h2 class="section-title">Cumplimiento normativo — matriz de operacionalización</h2>
+      <div class="compliance-grid">
+        <div class="compliance-card">
+          <span class="lbl">ISO/IEC 27001</span>
+          <strong class="pct-big">{{ iso.cumplimientoIso27001().porcentajeGeneral }}%</strong>
+          <small>{{ iso.cumplimientoIso27001().controlesAplicados }}/{{ iso.cumplimientoIso27001().controlesTotal }} controles aplicados</small>
+        </div>
+        <div class="compliance-card">
+          <span class="lbl">ISO/IEC 25000</span>
+          <strong class="pct-big">{{ iso.cumplimientoIso25000().porcentajeGeneral }}%</strong>
+          <small>{{ iso.cumplimientoIso25000().controlesAplicados }}/{{ iso.cumplimientoIso25000().controlesTotal }} métricas cumplen umbral</small>
+        </div>
+        <div class="compliance-card">
+          <span class="lbl">Confianza institucional</span>
+          <strong class="pct-big">{{ iso.confianzaInstitucional().nivel }}%</strong>
+          <small>Dimensión 15 — postura de ciberseguridad</small>
+        </div>
+      </div>
+
+      <h3 class="sub-title">Matriz de riesgo TI</h3>
+      <div class="risk-matrix-wrap panel">
+        <table class="reports-table">
+          <thead>
+            <tr><th>Activo</th><th>Amenaza</th><th>Impacto</th><th>Prob.</th><th>Nivel</th><th>Tratamiento</th><th>Control ISO</th></tr>
+          </thead>
+          <tbody>
+            @for (risk of iso.riesgos(); track risk.id) {
+              <tr>
+                <td>{{ risk.activoAfectado }}</td>
+                <td>{{ risk.amenaza }}</td>
+                <td class="mono">{{ risk.impacto }}</td>
+                <td class="mono">{{ risk.probabilidad }}</td>
+                <td><span class="risk-dot" [style.background]="semaforoRiesgo(risk.nivel)"></span>{{ riesgoNivelLabels[risk.nivel] }}</td>
+                <td>{{ tratamientoLabels[risk.tratamiento] }}</td>
+                <td class="mono">{{ risk.controlIso ?? '—' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
 
     <section class="panel filters-panel">
       <h2 class="section-title">Filtros</h2>
@@ -78,6 +121,8 @@
                 <th>Estado</th>
                 <th>VLAN</th>
                 <th>Dispositivo</th>
+                <th>ISO</th>
+                <th>Riesgo</th>
                 <th>Fecha</th>
                 <th>Acciones</th>
               </tr>
@@ -91,6 +136,12 @@
                   <td><span class="badge" [class]="claseEstado(r.status)">{{ statusLabels[r.status] }}</span></td>
                   <td class="mono">{{ r.vlanId ?? '—' }}</td>
                   <td class="mono">{{ r.deviceIp ?? '—' }}</td>
+                  <td class="mono">{{ r.isoStandard ? isoStandardLabels[r.isoStandard] : '—' }}</td>
+                  <td>
+                    @if (r.riesgoNivel) {
+                      <span class="risk-dot" [style.background]="semaforoRiesgo(r.riesgoNivel)"></span>{{ riesgoNivelLabels[r.riesgoNivel] }}
+                    } @else { — }
+                  </td>
                   <td class="mono">{{ r.createdAt | date: 'short' }}</td>
                   <td class="row-actions">
                     <button type="button" class="btn btn-outline btn-sm" (click)="verDetalle(r)">Ver</button>
@@ -165,6 +216,49 @@
       <label>IP atacante<input formControlName="attackerIp" /></label>
     </div>
     <label>Acción tomada<textarea formControlName="actionTaken" rows="2"></textarea></label>
+
+    <fieldset class="iso-fieldset">
+      <legend>Trazabilidad ISO / matriz de operacionalización</legend>
+      <div class="form-row">
+        <label>Estándar
+          <select formControlName="isoStandard">
+            <option value="">—</option>
+            @for (s of isoStandards; track s) {
+              <option [value]="s">{{ isoStandardLabels[s] }}</option>
+            }
+          </select>
+        </label>
+        <label>Dimensión<input formControlName="dimension" placeholder="ej. segmentacion_vlan" /></label>
+        <label>Control ISO<input formControlName="controlIso" placeholder="ej. A.8.22" /></label>
+      </div>
+      <div class="form-row">
+        <label>Activo afectado<input formControlName="activoAfectado" /></label>
+        <label>Amenaza<input formControlName="amenaza" /></label>
+        <label>Vulnerabilidad<input formControlName="vulnerabilidad" /></label>
+      </div>
+      <div class="form-row">
+        <label>Impacto (1-5)<input type="number" min="1" max="5" formControlName="impacto" /></label>
+        <label>Probabilidad (1-5)<input type="number" min="1" max="5" formControlName="probabilidad" /></label>
+        <label>Nivel de riesgo
+          <select formControlName="riesgoNivel">
+            <option value="">—</option>
+            @for (n of riesgoNiveles; track n) {
+              <option [value]="n">{{ riesgoNivelLabels[n] }}</option>
+            }
+          </select>
+        </label>
+        <label>Tratamiento
+          <select formControlName="tratamiento">
+            <option value="">—</option>
+            @for (t of tratamientos; track t) {
+              <option [value]="t">{{ tratamientoLabels[t] }}</option>
+            }
+          </select>
+        </label>
+      </div>
+      <label>Evidencia ISO (uno por línea)<textarea formControlName="evidenciaIsoText" rows="2"></textarea></label>
+    </fieldset>
+
     <label>Logs (uno por línea)<textarea formControlName="logsText" rows="3"></textarea></label>
     <label>Evidencia (uno por línea)<textarea formControlName="evidenceText" rows="3"></textarea></label>
     <div class="modal-actions">
@@ -189,6 +283,18 @@
         <div><span class="lbl">IP atacante</span><strong class="mono">{{ r.attackerIp ?? '—' }}</strong></div>
         <div><span class="lbl">Registrado por</span><strong>{{ r.createdBy }}</strong></div>
         <div><span class="lbl">Creado</span><strong>{{ r.createdAt | date: 'medium' }}</strong></div>
+        @if (r.isoStandard) {
+          <div><span class="lbl">Estándar ISO</span><strong>{{ isoStandardLabels[r.isoStandard] }}</strong></div>
+        }
+        @if (r.dimension) {
+          <div><span class="lbl">Dimensión</span><strong>{{ r.dimension }}</strong></div>
+        }
+        @if (r.controlIso) {
+          <div><span class="lbl">Control ISO</span><strong class="mono">{{ r.controlIso }}</strong></div>
+        }
+        @if (r.riesgoNivel) {
+          <div><span class="lbl">Riesgo</span><strong>{{ riesgoNivelLabels[r.riesgoNivel] }}</strong></div>
+        }
       </div>
       <p class="detail-block"><span class="lbl">Descripción</span>{{ r.description }}</p>
       @if (r.actionTaken) {

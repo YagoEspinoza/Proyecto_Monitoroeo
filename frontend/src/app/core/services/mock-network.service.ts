@@ -71,7 +71,23 @@ export class MockNetworkService implements OnDestroy {
         : 0,
       estadoGlobal,
       politicasActivas: this.policies.activas().length,
-      impactosPoliticas: this.policies.totalImpactos()
+      impactosPoliticas: this.policies.totalImpactos(),
+      gatewayActivo: 'RT-CORE-01 (10.0.0.1)',
+      gatewayRespaldo: 'RT-CORE-02 (10.0.0.2)',
+      disponibilidadRedPct: activos.length
+        ? +(activos.reduce((s, d) => s + d.uptime, 0) / activos.length).toFixed(2)
+        : 0,
+      tiempoRecuperacionPromedioSeg: 4,
+      indiceResiliencia: Math.round((devs.filter(d => d.nombre.includes('02') || d.tipo === 'router').length / devs.length) * 100),
+      puntosUnicoFallo: 1,
+      equiposRedundantes: devs.filter(d => d.nombre.includes('02')).length + 2,
+      cumplimientoIso27001Pct: 78,
+      cumplimientoIso25000Pct: 86,
+      riesgosCriticos: alts.filter(a => a.nivel === 'critico').length,
+      vulnerabilidadesAbiertas: devs.filter(d => d.seguridad === 'intruso' || d.seguridad === 'alerta').length,
+      uptimeSoftwarePct: 99.4,
+      tiempoRespuestaAlertaMs: 3200,
+      confianzaInstitucionalPct: 84
     };
   });
 
@@ -243,12 +259,14 @@ export class MockNetworkService implements OnDestroy {
 
   private datosInicialesVlans(): VlanSegmento[] {
     return [
-      { id: 10, nombre: 'Administración', rango: '10.0.0.0/24', gateway: '10.0.0.1', dispositivos: 2, traficoMbps: 12, maxMbps: 100, color: '#6366f1', estado: 'operativa', seguridad: 'seguro' },
-      { id: 20, nombre: 'Servidores', rango: '10.10.10.0/24', gateway: '10.10.10.1', dispositivos: 2, traficoMbps: 78, maxMbps: 100, color: '#10b981', estado: 'operativa', seguridad: 'seguro' },
-      { id: 30, nombre: 'Usuarios', rango: '192.168.30.0/24', gateway: '192.168.30.1', dispositivos: 4, traficoMbps: 52, maxMbps: 100, color: '#f59e0b', estado: 'incidente', seguridad: 'intruso' },
-      { id: 40, nombre: 'Distribución', rango: '10.0.1.0/24', gateway: '10.0.1.1', dispositivos: 3, traficoMbps: 91, maxMbps: 100, color: '#f97316', estado: 'degradada', seguridad: 'alerta' },
-      { id: 50, nombre: 'DMZ', rango: '172.16.5.0/24', gateway: '172.16.5.1', dispositivos: 1, traficoMbps: 23, maxMbps: 100, color: '#3b82f6', estado: 'operativa', seguridad: 'seguro' },
-      { id: 999, nombre: 'Cuarentena', rango: '192.168.99.0/24', gateway: '192.168.99.1', dispositivos: 1, traficoMbps: 2, maxMbps: 50, color: '#ef4444', estado: 'cuarentena', seguridad: 'aislado' }
+      { id: 10, nombre: 'Administración', areaInstitucional: 'administracion', rango: '10.0.0.0/24', gateway: '10.0.0.1', dispositivos: 2, traficoMbps: 12, maxMbps: 100, color: '#6366f1', estado: 'operativa', seguridad: 'seguro', politicasTraficoAplicadas: 8, bloqueosInterVlan24h: 2 },
+      { id: 20, nombre: 'Servidores', areaInstitucional: 'servidores', rango: '10.10.10.0/24', gateway: '10.10.10.1', dispositivos: 2, traficoMbps: 78, maxMbps: 100, color: '#10b981', estado: 'operativa', seguridad: 'seguro', politicasTraficoAplicadas: 12, bloqueosInterVlan24h: 0 },
+      { id: 30, nombre: 'Docentes', areaInstitucional: 'docentes', rango: '192.168.30.0/24', gateway: '192.168.30.1', dispositivos: 3, traficoMbps: 38, maxMbps: 100, color: '#f59e0b', estado: 'incidente', seguridad: 'intruso', politicasTraficoAplicadas: 6, bloqueosInterVlan24h: 14 },
+      { id: 35, nombre: 'Estudiantes', areaInstitucional: 'estudiantes', rango: '192.168.35.0/24', gateway: '192.168.35.1', dispositivos: 1, traficoMbps: 22, maxMbps: 100, color: '#eab308', estado: 'operativa', seguridad: 'alerta', politicasTraficoAplicadas: 5, bloqueosInterVlan24h: 8 },
+      { id: 36, nombre: 'Registros académicos', areaInstitucional: 'registros_academicos', rango: '192.168.36.0/24', gateway: '192.168.36.1', dispositivos: 0, traficoMbps: 4, maxMbps: 50, color: '#a855f7', estado: 'operativa', seguridad: 'seguro', politicasTraficoAplicadas: 10, bloqueosInterVlan24h: 3 },
+      { id: 40, nombre: 'Distribución', areaInstitucional: 'infraestructura', rango: '10.0.1.0/24', gateway: '10.0.1.1', dispositivos: 3, traficoMbps: 91, maxMbps: 100, color: '#f97316', estado: 'degradada', seguridad: 'alerta', politicasTraficoAplicadas: 4, bloqueosInterVlan24h: 1 },
+      { id: 50, nombre: 'DMZ', areaInstitucional: 'infraestructura', rango: '172.16.5.0/24', gateway: '172.16.5.1', dispositivos: 1, traficoMbps: 23, maxMbps: 100, color: '#3b82f6', estado: 'operativa', seguridad: 'seguro', politicasTraficoAplicadas: 7, bloqueosInterVlan24h: 5 },
+      { id: 999, nombre: 'Cuarentena', areaInstitucional: 'cuarentena', rango: '192.168.99.0/24', gateway: '192.168.99.1', dispositivos: 1, traficoMbps: 2, maxMbps: 50, color: '#ef4444', estado: 'cuarentena', seguridad: 'aislado', politicasTraficoAplicadas: 15, bloqueosInterVlan24h: 47 }
     ];
   }
 

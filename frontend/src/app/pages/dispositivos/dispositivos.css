@@ -5,6 +5,15 @@
   margin-bottom: 16px;
 }
 
+.resilience-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 10px 16px;
+  margin-bottom: 16px;
+  font-size: 0.85rem;
+}
+
 .search-input {
   flex: 1;
   min-width: 200px;

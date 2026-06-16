@@ -3,9 +3,11 @@
     <header class="page-header">
       <div>
         <h1 class="page-title">Auditoría y logs</h1>
-        <p class="page-subtitle">Registro de eventos del sistema · {{ mock.reloj() | date:'dd/MM/yyyy HH:mm:ss' }}</p>
+        <p class="page-subtitle">Logs del sistema y trazabilidad de usuarios · evidencia ISO A.8.15</p>
       </div>
       <div class="header-btns">
+        <button type="button" class="btn btn-sm" [class.btn-primary]="vista() === 'logs'" [class.btn-outline]="vista() !== 'logs'" (click)="vista.set('logs')">Logs sistema</button>
+        <button type="button" class="btn btn-sm" [class.btn-primary]="vista() === 'usuarios'" [class.btn-outline]="vista() !== 'usuarios'" (click)="vista.set('usuarios')">Auditoría usuarios</button>
         <span class="live-badge" [class.off]="!enVivo()">
           <span class="pulse-dot"></span> {{ enVivo() ? 'EN VIVO' : 'PAUSADO' }}
         </span>
@@ -18,6 +20,33 @@
         </button>
       </div>
     </header>
+
+    @if (vista() === 'usuarios') {
+      <section class="panel">
+        <div class="panel-header"><span class="panel-title">Registro de accesos y acciones (confidencialidad — Dim. 11)</span></div>
+        <div class="panel-body">
+          @if (registrosUsuario().length === 0) {
+            <app-empty-state titulo="Sin registros" descripcion="Las acciones de usuario aparecerán aquí." />
+          } @else {
+            <table class="data-table">
+              <thead><tr><th>Fecha</th><th>Usuario</th><th>Rol</th><th>Módulo</th><th>Acción</th><th>Detalle</th></tr></thead>
+              <tbody>
+                @for (r of registrosUsuario(); track r.id) {
+                  <tr [class.critico]="r.critico">
+                    <td class="mono">{{ r.timestamp | date:'short' }}</td>
+                    <td>{{ r.usuarioNombre }}</td>
+                    <td>{{ r.rol }}</td>
+                    <td>{{ r.modulo }}</td>
+                    <td>{{ r.accion }}</td>
+                    <td>{{ r.detalle }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+        </div>
+      </section>
+    } @else {
 
     <div class="toolbar toolbar-modulos">
       <span class="toolbar-label">Módulo:</span>
@@ -65,6 +94,7 @@
           }
         </div>
       </section>
+    }
     }
   </div>
 </app-page-shell>

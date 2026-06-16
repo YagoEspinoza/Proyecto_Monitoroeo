@@ -27,8 +27,7 @@ export class AuditoriaComponent {
   readonly filtroModulo = signal<FiltroModulo>('todos');
   readonly exportando = signal(false);
   readonly enVivo = signal(true);
-
-  readonly modulos = MODULOS_SOC;
+  readonly vista = signal<'logs' | 'usuarios'>('logs');
 
   readonly logsFiltrados = computed(() => {
     const fNivel = this.filtroNivel();
@@ -42,6 +41,10 @@ export class AuditoriaComponent {
     }
     return logs;
   });
+
+  readonly modulos = MODULOS_SOC;
+
+  readonly registrosUsuario = computed(() => this.audit.registros().slice(0, 100));
 
   exportar(): void {
     this.exportando.set(true);

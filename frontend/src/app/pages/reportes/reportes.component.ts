@@ -12,17 +12,28 @@ import { extraerMensajeError } from '../../core/utils/error-message.util';
 import {
   CreateReportPayload,
   NetworkReport,
+  ISO_STANDARDS,
+  ISO_STANDARD_LABELS,
   REPORT_SEVERITIES,
   REPORT_SEVERITY_LABELS,
   REPORT_STATUSES,
   REPORT_STATUS_LABELS,
   REPORT_TYPE_LABELS,
   REPORT_TYPES,
+  RIESGO_NIVELES,
+  RIESGO_NIVEL_LABELS,
+  TRATAMIENTOS_RIESGO,
+  TRATAMIENTO_RIESGO_LABELS,
   ReportFilters,
   ReportSeverity,
   ReportStatus,
-  ReportType
+  ReportType,
+  RiesgoNivel,
+  TratamientoRiesgo,
+  IsoStandard
 } from '../../core/models/report.model';
+import { CONTROLES_ISO_27001 } from '../../core/constants/iso.constants';
+import { IsoComplianceService } from '../../core/services/iso-compliance.service';
 
 interface ReporteItem {
   tipo: 'logs' | 'alertas' | 'metricas' | 'auditoria' | 'incidentes';
@@ -49,6 +60,7 @@ export class ReportesComponent implements OnInit {
   readonly notif = inject(NotificationService);
   readonly reportSvc = inject(ReportService);
   readonly auth = inject(AuthService);
+  readonly iso = inject(IsoComplianceService);
 
   readonly exportando = signal(false);
   readonly cargando = signal(false);
@@ -66,13 +78,22 @@ export class ReportesComponent implements OnInit {
   readonly typeLabels = REPORT_TYPE_LABELS;
   readonly severityLabels = REPORT_SEVERITY_LABELS;
   readonly statusLabels = REPORT_STATUS_LABELS;
+  readonly isoStandards = ISO_STANDARDS;
+  readonly isoStandardLabels = ISO_STANDARD_LABELS;
+  readonly riesgoNiveles = RIESGO_NIVELES;
+  readonly riesgoNivelLabels = RIESGO_NIVEL_LABELS;
+  readonly tratamientos = TRATAMIENTOS_RIESGO;
+  readonly tratamientoLabels = TRATAMIENTO_RIESGO_LABELS;
+  readonly controlesIso = CONTROLES_ISO_27001;
 
   readonly items: ReporteItem[] = [
     { tipo: 'logs', titulo: 'Logs del sistema', desc: 'Eventos y auditoría en vivo' },
     { tipo: 'alertas', titulo: 'Alertas IDS', desc: 'Detecciones y estados' },
     { tipo: 'metricas', titulo: 'Métricas SOC', desc: 'KPIs del dashboard' },
     { tipo: 'auditoria', titulo: 'Auditoría de acciones', desc: 'Quién, cuándo y qué' },
-    { tipo: 'incidentes', titulo: 'Incidentes', desc: 'Hosts comprometidos y aislados' }
+    { tipo: 'incidentes', titulo: 'Incidentes', desc: 'Hosts comprometidos y aislados' },
+    { tipo: 'auditoria', titulo: 'Cumplimiento ISO 27001', desc: 'Controles y evidencias SGSI' },
+    { tipo: 'metricas', titulo: 'Calidad ISO 25000', desc: 'Métricas SQuaRE del software SOC' }
   ];
 
   readonly filtros = this.fb.group({
@@ -97,13 +118,25 @@ export class ReportesComponent implements OnInit {
     attackerIp: [''],
     actionTaken: [''],
     evidenceText: [''],
-    logsText: ['']
+    logsText: [''],
+    isoStandard: ['' as IsoStandard | ''],
+    dimension: [''],
+    controlIso: [''],
+    riesgoNivel: ['' as RiesgoNivel | ''],
+    impacto: [''],
+    probabilidad: [''],
+    activoAfectado: [''],
+    amenaza: [''],
+    vulnerabilidad: [''],
+    tratamiento: ['' as TratamientoRiesgo | ''],
+    evidenciaIsoText: ['']
   });
 
   readonly listaFiltrada = computed(() => this.reportes());
 
   ngOnInit(): void {
     this.cargarReportes();
+    this.iso.cargarResumenBackend();
   }
 
   cargarReportes(): void {
@@ -162,7 +195,18 @@ export class ReportesComponent implements OnInit {
       attackerIp: '',
       actionTaken: '',
       evidenceText: '',
-      logsText: ''
+      logsText: '',
+      isoStandard: '',
+      dimension: '',
+      controlIso: '',
+      riesgoNivel: '',
+      impacto: '',
+      probabilidad: '',
+      activoAfectado: '',
+      amenaza: '',
+      vulnerabilidad: '',
+      tratamiento: '',
+      evidenciaIsoText: ''
     });
     this.modalForm.set(true);
   }
@@ -182,7 +226,18 @@ export class ReportesComponent implements OnInit {
       attackerIp: r.attackerIp ?? '',
       actionTaken: r.actionTaken ?? '',
       evidenceText: (r.evidence ?? []).join('\n'),
-      logsText: (r.logs ?? []).join('\n')
+      logsText: (r.logs ?? []).join('\n'),
+      isoStandard: r.isoStandard ?? '',
+      dimension: r.dimension ?? '',
+      controlIso: r.controlIso ?? '',
+      riesgoNivel: r.riesgoNivel ?? '',
+      impacto: r.impacto != null ? String(r.impacto) : '',
+      probabilidad: r.probabilidad != null ? String(r.probabilidad) : '',
+      activoAfectado: r.activoAfectado ?? '',
+      amenaza: r.amenaza ?? '',
+      vulnerabilidad: r.vulnerabilidad ?? '',
+      tratamiento: r.tratamiento ?? '',
+      evidenciaIsoText: (r.evidenciaIso ?? []).join('\n')
     });
     this.modalForm.set(true);
   }
@@ -219,7 +274,18 @@ export class ReportesComponent implements OnInit {
       actionTaken: v.actionTaken?.trim() || undefined,
       createdBy: this.auth.usuario()?.nombre ?? 'Usuario SOC',
       evidence: this.splitLines(v.evidenceText),
-      logs: this.splitLines(v.logsText)
+      logs: this.splitLines(v.logsText),
+      isoStandard: (v.isoStandard || undefined) as IsoStandard | undefined,
+      dimension: v.dimension?.trim() || undefined,
+      controlIso: v.controlIso?.trim() || undefined,
+      riesgoNivel: (v.riesgoNivel || undefined) as RiesgoNivel | undefined,
+      impacto: v.impacto ? Number(v.impacto) : undefined,
+      probabilidad: v.probabilidad ? Number(v.probabilidad) : undefined,
+      activoAfectado: v.activoAfectado?.trim() || undefined,
+      amenaza: v.amenaza?.trim() || undefined,
+      vulnerabilidad: v.vulnerabilidad?.trim() || undefined,
+      tratamiento: (v.tratamiento || undefined) as TratamientoRiesgo | undefined,
+      evidenciaIso: this.splitLines(v.evidenciaIsoText)
     };
 
     this.guardando.set(true);
@@ -286,6 +352,14 @@ export class ReportesComponent implements OnInit {
 
   claseEstado(s: ReportStatus): string {
     return { OPEN: 'st-open', IN_PROGRESS: 'st-progress', RESOLVED: 'st-resolved', ARCHIVED: 'st-archived' }[s];
+  }
+
+  semaforoRiesgo(nivel?: string): string {
+    return this.iso.semaforoRiesgo(nivel ?? 'bajo');
+  }
+
+  exportarCumplimientoIso(formato: FormatoExportacion): void {
+    this.exportar('auditoria', formato);
   }
 
   private splitLines(text: string | null | undefined): string[] {

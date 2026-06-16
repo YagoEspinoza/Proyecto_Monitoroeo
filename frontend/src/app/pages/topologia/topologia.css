@@ -4,6 +4,16 @@
   flex-wrap: wrap;
 }
 
+.ha-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+}
+.ha-item .lbl { display: block; font-size: 0.68rem; color: var(--text-muted); }
+.ha-item strong { font-size: 0.85rem; }
+
 .topology-layout {
   display: grid;
   grid-template-columns: 1fr 320px;

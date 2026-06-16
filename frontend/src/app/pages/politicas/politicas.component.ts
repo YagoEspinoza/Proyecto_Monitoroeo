@@ -13,6 +13,7 @@ import {
 import { ModalComponent } from '../../shared/components/modal/modal';
 import { PageShellComponent } from '../../shared/components/page-shell/page-shell';
 import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state';
+import { IsoComplianceService } from '../../core/services/iso-compliance.service';
 import {
   claseEstadoPolitica,
   etiquetaEstadoPolitica,
@@ -37,6 +38,7 @@ export class PoliticasComponent {
   readonly auth = inject(AuthService);
   readonly mock = inject(MockNetworkService);
   readonly policies = inject(SecurityPolicyService);
+  readonly iso = inject(IsoComplianceService);
 
   readonly busqueda = signal('');
   readonly modalAbierto = signal(false);
