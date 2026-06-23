@@ -19,7 +19,7 @@ Documentación académica que vincula la **matriz de operacionalización de la t
 | [../procesos/clasificacion_procesos.md](../procesos/clasificacion_procesos.md) | Procesos del sistema (1–32) clasificados por tipo |
 | [../manualdeusuario.md](../manualdeusuario.md) | Uso operativo de pantallas SOC |
 | [../arquitectura.md](../arquitectura.md) | Arquitectura técnica general |
-| [../manual-desarrollo.md](../manual-desarrollo.md) | Entorno de desarrollo |
+| [../estado_arte_aplicado/](../estado_arte_aplicado/) | Trazabilidad estado del arte → implementación en código |
 
 ## Código fuente de referencia
 
