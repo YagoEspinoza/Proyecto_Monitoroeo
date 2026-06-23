@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://netguard-backend-yapa.onrender.com/api',
-  wsUrl: 'https://netguard-backend-yapa.onrender.com'
+  apiUrl: 'http://tu-servidor.com/api',
+  wsUrl: 'http://tu-servidor.com'
 };
