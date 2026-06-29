@@ -1,18 +1,21 @@
 <div class="login-wrapper">
+  <app-university-brand variant="banner" class="login-top-banner" />
+
   <div class="grid-bg" aria-hidden="true"></div>
   <div class="scanline" aria-hidden="true"></div>
 
   <div class="login-container">
+    <app-university-brand variant="hero" />
+
     <div class="logo-section">
-      <div class="logo-box">SOC</div>
-      <h1 class="logo-title">NetGuard <span>Enterprise</span></h1>
+      <h2 class="logo-title">NetGuard <span>Enterprise</span></h2>
       <p class="logo-subtitle">// SISTEMA DE MONITOREO DE REDES</p>
     </div>
 
     <div class="login-card">
       <div class="card-header-bar"></div>
       <div class="card-body-inner">
-        <p class="access-label">&gt; ACCESO AL SISTEMA</p>
+        <p class="access-label">&gt; ACCESO AL SISTEMA INSTITUCIONAL</p>
 
         @if (error()) {
           <div class="alert-error" role="alert"><span>!</span> {{ error() }}</div>
@@ -47,4 +50,6 @@
       </div>
     </div>
   </div>
+
+  <app-university-brand variant="footer" class="login-footer" />
 </div>

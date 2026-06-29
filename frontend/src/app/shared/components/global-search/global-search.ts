@@ -38,7 +38,7 @@ import { GlobalSearchService } from '../../../core/services/global-search.servic
             </button>
           }
         </div>
-        <footer class="gs-footer mono">Ctrl+K · NetGuard SOC</footer>
+        <footer class="gs-footer mono">Ctrl+K · Universidad Roosevelt del Perú</footer>
       </div>
     }
   `,

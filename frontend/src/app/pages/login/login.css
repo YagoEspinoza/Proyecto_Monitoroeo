@@ -1,11 +1,23 @@
 .login-wrapper {
   min-height: 100vh;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
   position: relative;
   overflow: hidden;
   background: var(--bg-app);
+}
+
+.login-top-banner {
+  position: relative;
+  z-index: 20;
+  flex-shrink: 0;
+}
+
+.login-footer {
+  position: relative;
+  z-index: 20;
+  flex-shrink: 0;
+  margin-top: auto;
 }
 
 .grid-bg {
@@ -36,29 +48,21 @@
   position: relative;
   z-index: 10;
   width: 100%;
-  max-width: 400px;
-  padding: 1rem;
+  max-width: 420px;
+  padding: 1.5rem 1rem 2rem;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2rem;
+  gap: 1.25rem;
+  flex: 1;
+  justify-content: center;
 }
 
-.logo-section { text-align: center; }
-
-.logo-box {
-  background-color: var(--color-brand);
-  color: white;
-  padding: 10px 18px;
-  border-radius: 4px;
-  font-weight: bold;
-  font-size: 1.2rem;
-  display: inline-block;
-  margin-bottom: 12px;
-}
+.logo-section { text-align: center; margin-top: 4px; }
 
 .logo-title {
-  font-size: 1.6rem;
+  font-size: 1.35rem;
   margin: 0;
   color: var(--text-primary);
 }
@@ -80,7 +84,7 @@
 }
 .card-header-bar {
   height: 3px;
-  background: var(--color-brand);
+  background: linear-gradient(90deg, #b91c1c, #fbbf24);
 }
 .card-body-inner { padding: 24px; }
 

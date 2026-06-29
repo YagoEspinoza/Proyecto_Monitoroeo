@@ -5,11 +5,11 @@
 
   <aside class="sidebar" [class.open]="sidebarAbierto()" [class.collapsed]="sidebarColapsado()">
     <div class="sidebar-brand">
-      <div class="brand-icon"><span class="shield">⬡</span></div>
       @if (!sidebarColapsado()) {
-        <div class="brand-text">
-          <strong>NetGuard SOC</strong>
-          <span class="brand-sub">VLAN Security Monitor</span>
+        <app-university-brand variant="sidebar" />
+      } @else {
+        <div class="brand-icon-collapsed" title="{{ universidad }}">
+          <span>UR</span>
         </div>
       }
     </div>
@@ -64,6 +64,8 @@
   </aside>
 
   <div class="main-wrapper">
+    <app-university-brand variant="banner" />
+
     <header class="topbar">
       <div class="topbar-left">
         <button
@@ -75,7 +77,7 @@
           ☰
         </button>
         <nav class="breadcrumbs" aria-label="Ruta actual">
-          <span class="crumb-dim">NetGuard</span>
+          <span class="crumb-dim">{{ universidad }}</span>
           <span class="crumb-sep" aria-hidden="true">/</span>
           <strong>{{ tituloPagina() }}</strong>
         </nav>
@@ -133,6 +135,8 @@
     <main class="dashboard-content" id="main-content">
       <router-outlet />
     </main>
+
+    <app-university-brand variant="footer" />
   </div>
 
   <button

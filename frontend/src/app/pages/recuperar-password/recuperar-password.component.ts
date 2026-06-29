@@ -4,12 +4,13 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { APP_ROUTES } from '../../core/constants/routes.constants';
+import { UniversityBrandComponent } from '../../shared/components/university-brand/university-brand';
 import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-recuperar-password',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, UniversityBrandComponent],
   templateUrl: './recuperar-password.component.html',
   styleUrl: './recuperar-password.css'
 })

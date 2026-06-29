@@ -24,6 +24,8 @@ import { GlobalSearchComponent } from '../../shared/components/global-search/glo
 import { NotificationCenterComponent } from '../../shared/components/notification-center/notification-center';
 import { SocAiAssistantComponent } from '../../shared/components/soc-ai-assistant/soc-ai-assistant';
 import { OnboardingTourComponent } from '../../shared/components/onboarding-tour/onboarding-tour';
+import { UniversityBrandComponent } from '../../shared/components/university-brand/university-brand';
+import { UNIVERSIDAD_NOMBRE_COMPLETO } from '../../core/constants/branding.constants';
 
 interface NavItem {
   ruta: string;
@@ -48,7 +50,8 @@ interface NavItem {
     GlobalSearchComponent,
     NotificationCenterComponent,
     SocAiAssistantComponent,
-    OnboardingTourComponent
+    OnboardingTourComponent,
+    UniversityBrandComponent
   ],
   templateUrl: './main-layout.component.html',
   styleUrls: ['./main-layout.component.css']
@@ -65,6 +68,8 @@ export class MainLayoutComponent implements OnInit {
   readonly ai = inject(SocAiService);
   readonly onboarding = inject(OnboardingService);
   private readonly activity = inject(UserActivityService);
+
+  readonly universidad = UNIVERSIDAD_NOMBRE_COMPLETO;
 
   readonly userPanel = viewChild(UserPanelComponent);
 

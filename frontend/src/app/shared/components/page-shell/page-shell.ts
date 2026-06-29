@@ -1,12 +1,13 @@
 import { Component, Input, inject } from '@angular/core';
 import { MockNetworkService } from '../../../core/services/mock-network.service';
+import { UniversityBrandComponent } from '../university-brand/university-brand';
 import { LoaderComponent } from '../loader/loader';
 import { SkeletonComponent } from '../skeleton/skeleton';
 
 @Component({
   selector: 'app-page-shell',
   standalone: true,
-  imports: [LoaderComponent, SkeletonComponent],
+  imports: [LoaderComponent, SkeletonComponent, UniversityBrandComponent],
   template: `
     @if (mock.cargando()) {
       @if (useSkeleton) {
@@ -23,6 +24,7 @@ import { SkeletonComponent } from '../skeleton/skeleton';
         <app-loader [mensaje]="loaderMessage" />
       }
     } @else {
+      <app-university-brand variant="compact" />
       <ng-content />
     }
   `,

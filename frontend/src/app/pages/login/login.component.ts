@@ -4,12 +4,13 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { APP_ROUTES } from '../../core/constants/routes.constants';
 import { AuthService } from '../../core/services/auth.service';
+import { UniversityBrandComponent } from '../../shared/components/university-brand/university-brand';
 import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, UniversityBrandComponent],
   templateUrl: './login.component.html',
   styleUrls: ['./login.css']
 })
